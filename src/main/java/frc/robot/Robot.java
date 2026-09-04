@@ -12,12 +12,11 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.ballmanipulator.BallManipulator;
@@ -28,10 +27,9 @@ import frc.robot.climber.Piston;
 import frc.robot.controls.Controls;
 import frc.robot.drivebase.DriveBase;
 import frc.robot.gimbal.Gimbal;
+import frc.robot.motorcontrol.DualMotorController;
 import frc.robot.pinout.PinOut;
 import frc.robot.ultrasonic.Ultrasonic;
-import frc.robot.weelspinner.ColorManager;
-import frc.robot.weelspinner.Spinner;
 import frc.robot.weelspinner.WeelSpinner;
 import edu.wpi.first.wpilibj.Compressor;
 
@@ -65,14 +63,14 @@ public class Robot extends TimedRobot {
   private BallManipulator ballManipulator;
   private PinOut pinout;
 
-  private SpeedController speedControllerFrontRightDrive; 
-  private SpeedController speedControllerFrontLeftDrive;
-  private SpeedController speedControllerBackRightDrive;
-  private SpeedController speedControllerBackLeftDrive;
-  private SpeedController speedControllerBelt;
-  private SpeedController speedControllerRoller;
-  private SpeedControllerGroup speedControllerGroupLeftDrive; 
-  private SpeedControllerGroup speedControllerGroupRightDrive;
+  private MotorController speedControllerFrontRightDrive; 
+  private MotorController speedControllerFrontLeftDrive;
+  private MotorController speedControllerBackRightDrive;
+  private MotorController speedControllerBackLeftDrive;
+  private MotorController speedControllerBelt;
+  private MotorController speedControllerRoller;
+  private DualMotorController speedControllerGroupLeftDrive; 
+  private DualMotorController speedControllerGroupRightDrive;
   private Encoder encoderLeft;
   private Encoder encoderRight;
 
@@ -84,7 +82,7 @@ public class Robot extends TimedRobot {
   private Piston pistonRight;
 
   //private ColorManager colorManager;
-  private SpeedController spinner;
+  private MotorController spinner;
 
   private Belts belt;
   private Roller roller;
@@ -129,8 +127,8 @@ public class Robot extends TimedRobot {
     speedControllerBackLeftDrive = new Talon(pinout.PWMbackLeftDrive);
     speedControllerFrontRightDrive = new Talon(pinout.PWMfrontRightDrive);
     speedControllerBackRightDrive = new Talon(pinout.PWMbackRightDrive);
-    speedControllerGroupLeftDrive = new SpeedControllerGroup(speedControllerFrontLeftDrive, speedControllerBackLeftDrive);
-    speedControllerGroupRightDrive = new SpeedControllerGroup(speedControllerFrontRightDrive, speedControllerBackRightDrive);
+    speedControllerGroupLeftDrive = new DualMotorController(speedControllerFrontLeftDrive, speedControllerBackLeftDrive);
+    speedControllerGroupRightDrive = new DualMotorController(speedControllerFrontRightDrive, speedControllerBackRightDrive);
     driveBase = new DriveBase(
       speedControllerGroupLeftDrive,
       speedControllerGroupRightDrive,
@@ -159,13 +157,21 @@ public class Robot extends TimedRobot {
       pinout.rollerButton,
       pinout.driveSlowButton);
 
-    leftSolenoid = new DoubleSolenoid(pinout.CAMpcm,pinout.ChannelSolenoidLeftForward,pinout.ChannelSolenoidLeftReverse);
-    rightSolenoid = new DoubleSolenoid(pinout.CAMpcm,pinout.ChannelSolenoidRightForward,pinout.ChannelSolenoidRightReverse);
+    leftSolenoid = new DoubleSolenoid(
+      pinout.CAMpcm,
+      PneumaticsModuleType.CTREPCM,
+      pinout.ChannelSolenoidLeftForward,
+      pinout.ChannelSolenoidLeftReverse);
+    rightSolenoid = new DoubleSolenoid(
+      pinout.CAMpcm,
+      PneumaticsModuleType.CTREPCM,
+      pinout.ChannelSolenoidRightForward,
+      pinout.ChannelSolenoidRightReverse);
     pistonLeft = new Piston(leftSolenoid, pinout.solenoidLeftIn, pinout.solenoidLeftOut);
     pistonRight = new Piston(rightSolenoid, pinout.solenoidRightIn, pinout.solenoidRightOut);
     climber = new Climber(pistonLeft, pistonRight);
     
-    compressor = new Compressor(2); /// pneumatics
+    compressor = new Compressor(pinout.CAMpcm, PneumaticsModuleType.CTREPCM);
 
 
     spinner = new Talon(pinout.PWMspinner);
@@ -193,7 +199,7 @@ public class Robot extends TimedRobot {
       pinout.normalValue,
       pinout.slowValue);
 
-    CameraServer.getInstance().startAutomaticCapture(0);
+    CameraServer.startAutomaticCapture(0);
   }
 
   /**
@@ -307,7 +313,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     teleop.periodic();
 
-    compressor.start();
+    compressor.enableDigital();
 
     /*if(compressor.getPressureSwitchValue() == false)
     {
@@ -325,7 +331,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    compressor.start();
+    compressor.enableDigital();
     reset();
   }
 }

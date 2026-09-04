@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -149,8 +149,8 @@ public class DriveBaseTest
             double leftExpected,
             double rightExpected)
     {
-        SpeedController dummyLeft = Mockito.mock(SpeedController.class);
-        SpeedController dummyRight = Mockito.mock(SpeedController.class);
+        MotorController dummyLeft = Mockito.mock(MotorController.class);
+        MotorController dummyRight = Mockito.mock(MotorController.class);
         DigitalInput dummyLimitSwitchLeft = Mockito.mock(DigitalInput.class);
         DigitalInput dummyLimitSwitchRight = Mockito.mock(DigitalInput.class);
         DriveBase robot = new DriveBase(dummyLeft, dummyRight, null, null, rightDriveForward, dummyLimitSwitchLeft, dummyLimitSwitchRight,true,true);

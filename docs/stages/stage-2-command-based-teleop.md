@@ -81,6 +81,62 @@ Planned first actions:
 | `WeelSpinner` | Wheel spinner subsystem hardware/control layer | Wrap first | Low | Small mechanism, likely straightforward. |
 | `Controls` | Controller bindings/input translation | Replace gradually | Medium | Likely absorbed into `RobotContainer` bindings. |
 
+### 2026-09-04 First Command-Based Slice
+
+Actions taken:
+
+1. Added the 2026 `WPILibNewCommands` vendordep so command-based classes are available to the project.
+2. Added `RobotContainer` as the new wiring point for teleop hardware and operator controls.
+3. Added initial subsystem wrappers around the existing mechanism classes:
+   `DriveSubsystem`, `ClimberSubsystem`, `BallManipulatorSubsystem`, `GimbalSubsystem`, and `WheelSpinnerSubsystem`.
+4. Moved hardware construction for teleop-owned mechanisms from `Robot` into `RobotContainer`.
+5. Introduced a scheduled teleop command path using `RunCommand` while keeping the existing low-level mechanism classes intact.
+6. Kept the old `Teleop.java` file in the tree as a readable reference during the transition.
+
+Why this slice:
+
+1. It introduces the standard command-based structure without forcing a full rewrite in one step.
+2. It makes `Robot` thinner immediately.
+3. It keeps behavior logic traceable because the command-based teleop cycle still closely mirrors the old `Teleop.periodic()` flow.
+
+Expected follow-up work:
+
+1. Replace the single scheduled teleop cycle with more idiomatic default commands and bindings.
+2. Move more responsibility from the transition layer into commands and subsystem methods.
+3. Decide when `Teleop.java` can be removed after the new structure is proven stable.
+
+Verification:
+
+1. Ran `./gradlew build`.
+2. The project built successfully.
+3. Existing unit tests passed.
+4. A first pass used `teleopCommand.schedule()` and produced a deprecation warning.
+5. Replaced that call with `CommandScheduler.getInstance().schedule(teleopCommand)`.
+6. Re-ran `./gradlew build` successfully with no build warnings.
+
+### 2026-09-04 Default Commands and Bindings Slice
+
+Actions taken:
+
+1. Added explicit teleop command classes under `src/main/java/frc/robot/commands`.
+2. Replaced the single scheduled teleop loop with subsystem default commands.
+3. Added a command-based reverse-drive binding using `Trigger` and `InstantCommand`.
+4. Removed the temporary `teleopCommand` scheduling path from `Robot`.
+5. Kept `Controls` as the input translation layer for now so behavior mapping stays readable.
+
+Why this slice:
+
+1. This is the first step that looks like a real command-based robot instead of a scheduled compatibility loop.
+2. Students can now see the distinction between subsystem ownership, default commands, and button-triggered actions.
+3. The existing behavior is still recognizable because each new command closely mirrors a piece of the old `Teleop.periodic()` logic.
+
+Verification:
+
+1. Ran `./gradlew build`.
+2. The project built successfully.
+3. Existing unit tests passed.
+4. No build warnings were emitted.
+
 ## Student Notes
 
 This is the main architectural teaching stage. It should explain how the existing `TimedRobot` and `Teleop` flow maps into subsystems, default commands, and button bindings.

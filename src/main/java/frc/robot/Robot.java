@@ -7,31 +7,10 @@
 
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.ballmanipulator.BallManipulator;
-import frc.robot.ballmanipulator.Belts;
-import frc.robot.ballmanipulator.Roller;
-import frc.robot.climber.Climber;
-import frc.robot.climber.Piston;
-import frc.robot.controls.Controls;
-import frc.robot.drivebase.DriveBase;
-import frc.robot.gimbal.Gimbal;
-import frc.robot.motorcontrol.DualMotorController;
-import frc.robot.pinout.PinOut;
-import frc.robot.ultrasonic.Ultrasonic;
-import frc.robot.weelspinner.WeelSpinner;
-import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 
 /**
@@ -53,153 +32,21 @@ public class Robot extends TimedRobot {
   private DriveBackwardIntakeState driveBackwardIntakeState;
   private DriveForwardScoreState driveForwardScoreState;
   private long drivingForwardStartTime;
-
-  private Teleop teleop;
-
-  private Climber climber;
-  private Controls controls;
-  private DriveBase driveBase;
-  private WeelSpinner weelSpinner;
-  private BallManipulator ballManipulator;
-  private PinOut pinout;
-
-  private MotorController speedControllerFrontRightDrive; 
-  private MotorController speedControllerFrontLeftDrive;
-  private MotorController speedControllerBackRightDrive;
-  private MotorController speedControllerBackLeftDrive;
-  private MotorController speedControllerBelt;
-  private MotorController speedControllerRoller;
-  private DualMotorController speedControllerGroupLeftDrive; 
-  private DualMotorController speedControllerGroupRightDrive;
-  private Encoder encoderLeft;
-  private Encoder encoderRight;
-
-  private Joystick joystickLeft;
-  private Joystick joystickRight;
-  private Joystick gamepad;
-
-  private Piston pistonLeft;
-  private Piston pistonRight;
-
-  //private ColorManager colorManager;
-  private MotorController spinner;
-
-  private Belts belt;
-  private Roller roller;
-
-  private DoubleSolenoid leftSolenoid;
-  private DoubleSolenoid rightSolenoid;
-
-  private DigitalInput leftLimitSwitch;
-  private DigitalInput rightLimitSwitch;
-
-  private Servo servoXaxis;
-  private Servo servoYaxis;
-  private Gimbal gimbal;
-
-  private Ultrasonic ultrasonicLeft;
-  private Ultrasonic ultrasonicRight;
-
-  private Compressor compressor;
+  // Stage 2 transition: hardware wiring moved out of Robot and into RobotContainer.
+  private RobotContainer robotContainer;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
   @Override
   public void robotInit() {
-    pinout = new PinOut();
-
     m_chooser.setDefaultOption("Drive Forawrd And Score", kDriveForwardAndScore);
     m_chooser.addOption("Drive Forward", kDriveForwardCountinouslyAuto);
     m_chooser.addOption("Don't Do Anything" , kDontDoAnyThingAuto);
     //m_chooser.addOption("Drive Backwards" , kDriveBackwardsandIntake);
     SmartDashboard.putData("Auto choices", m_chooser);
-    
-    servoXaxis = new Servo(pinout.PWMServoXAxis);
-    servoYaxis = new Servo(pinout.PWMServoYAxis);
-    gimbal = new Gimbal(servoXaxis, servoYaxis);
-    //gimbal.gimbalInitialPosition();  // sets up the gimbal for autonomous mode
-
-    leftLimitSwitch = new DigitalInput(pinout.DIOleftLimitSwitch);
-    rightLimitSwitch = new DigitalInput(pinout.DIOrightLimitSwitch);
-
-    speedControllerFrontLeftDrive = new Talon(pinout.PWMfrontLeftDrive);
-    speedControllerBackLeftDrive = new Talon(pinout.PWMbackLeftDrive);
-    speedControllerFrontRightDrive = new Talon(pinout.PWMfrontRightDrive);
-    speedControllerBackRightDrive = new Talon(pinout.PWMbackRightDrive);
-    speedControllerGroupLeftDrive = new DualMotorController(speedControllerFrontLeftDrive, speedControllerBackLeftDrive);
-    speedControllerGroupRightDrive = new DualMotorController(speedControllerFrontRightDrive, speedControllerBackRightDrive);
-    driveBase = new DriveBase(
-      speedControllerGroupLeftDrive,
-      speedControllerGroupRightDrive,
-      encoderLeft,encoderRight,
-      pinout.rightDriveForward,
-      leftLimitSwitch,
-      rightLimitSwitch,
-      pinout.leftLimitSwitchTrippedValue,
-      pinout.rightLimitSwitchTrippedValue);
-    
-    joystickLeft = new Joystick(pinout.leftJoystickNum);
-    joystickRight = new Joystick(pinout.rightJoystickNum);
-    gamepad = new Joystick(pinout.gamepadNum);
-    controls = new Controls(
-      joystickLeft,
-      joystickRight,
-      gamepad,
-      pinout.leftDriveAxis,
-      pinout.rightDriveAxis,
-      pinout.gimbalXAxisChannel,
-      pinout.gimbalYAxisChannel,
-      pinout.climberButton,
-      pinout.reverseButton,
-      pinout.beltInButton,
-      pinout.beltOutButton,
-      pinout.rollerButton,
-      pinout.driveSlowButton);
-
-    leftSolenoid = new DoubleSolenoid(
-      pinout.CAMpcm,
-      PneumaticsModuleType.CTREPCM,
-      pinout.ChannelSolenoidLeftForward,
-      pinout.ChannelSolenoidLeftReverse);
-    rightSolenoid = new DoubleSolenoid(
-      pinout.CAMpcm,
-      PneumaticsModuleType.CTREPCM,
-      pinout.ChannelSolenoidRightForward,
-      pinout.ChannelSolenoidRightReverse);
-    pistonLeft = new Piston(leftSolenoid, pinout.solenoidLeftIn, pinout.solenoidLeftOut);
-    pistonRight = new Piston(rightSolenoid, pinout.solenoidRightIn, pinout.solenoidRightOut);
-    climber = new Climber(pistonLeft, pistonRight);
-    
-    compressor = new Compressor(pinout.CAMpcm, PneumaticsModuleType.CTREPCM);
-
-
-    spinner = new Talon(pinout.PWMspinner);
-    weelSpinner = new WeelSpinner(spinner);
-
-    speedControllerBelt = new Talon(pinout.PWMBelt);
-    speedControllerRoller = new Talon(pinout.PWMRoller);
-
-    belt = new Belts(speedControllerBelt);
-    roller = new Roller(speedControllerRoller);
-
-    ballManipulator = new BallManipulator(belt, roller, pinout.isBeltPositive, pinout.isRollerPositive);
-
-    ultrasonicRight = new Ultrasonic(pinout.ultrasonicRight);
-
-    teleop = new Teleop(
-      climber,
-      controls,
-      driveBase,
-      weelSpinner,
-      ballManipulator,
-      gimbal,
-      pinout.rollerSpeed,
-      pinout.beltSpeed,
-      pinout.normalValue,
-      pinout.slowValue);
-
-    CameraServer.startAutomaticCapture(0);
+    // Stage 2 change from the 2020 source: RobotContainer now owns teleop wiring and commands.
+    robotContainer = new RobotContainer();
   }
 
   /**
@@ -212,12 +59,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    // Command-based robots run bindings and default commands through the scheduler every cycle.
+    CommandScheduler.getInstance().run();
   }
 
   private void reset() {
-    driveBase.drive(0, 0);
-    ballManipulator.intake(0);
-    ballManipulator.outtake(0);
+    robotContainer.resetRobot();
   }
 
   /**
@@ -233,6 +80,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    // Cancel teleop/default commands before the old autonomous state machine runs.
+    CommandScheduler.getInstance().cancelAll();
     driveForwardScoreState = DriveForwardScoreState.NotStarted;
     driveBackwardIntakeState = DriveBackwardIntakeState.NotStarted;
     m_autoSelected = m_chooser.getSelected();
@@ -246,8 +95,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-
-    ultrasonicRight.updateDashboard();
+    robotContainer.updateAutonomousDashboard();
 
 
     switch (m_autoSelected) {
@@ -255,7 +103,7 @@ public class Robot extends TimedRobot {
         // Put custom auto code here
         break;
       case kDriveForwardCountinouslyAuto:
-        driveBase.drive(-0.5, -0.5 * 0.975);
+        robotContainer.drive(-0.5, -0.5 * 0.975);
         break;
       /*case kDriveBackwardsandIntake:
         switch (driveBackwardIntakeState) {
@@ -266,16 +114,16 @@ public class Robot extends TimedRobot {
 
           break;
           case DrivingForward: 
-            driveBase.drive(0.3, 0.3);
-            ballManipulator.intake(1);
+            robotContainer.drive(0.3, 0.3);
+            robotContainer.intake(1);
             if(System.currentTimeMillis()-drivingForwardStartTime>=5000){
               driveBackwardIntakeState = DriveBackwardIntakeState.Done;
 
             }
           break;
           case Done:
-            driveBase.drive(0, 0);
-            ballManipulator.intake(0);
+            robotContainer.drive(0, 0);
+            robotContainer.intake(0);
           break;
         }
         break;*/
@@ -289,15 +137,15 @@ public class Robot extends TimedRobot {
 
           break;
           case DrivingForward: 
-            driveBase.drive(-0.5, -0.5*0.975);
+            robotContainer.drive(-0.5, -0.5*0.975);
             if(System.currentTimeMillis()-drivingForwardStartTime>=2500){
               driveForwardScoreState = DriveForwardScoreState.Score;
 
             }
           break;
           case Score:
-            driveBase.drive(0, 0);
-            ballManipulator.outtake(1);
+            robotContainer.drive(0, 0);
+            robotContainer.outtake(1);
           break;
         }
 
@@ -310,20 +158,26 @@ public class Robot extends TimedRobot {
    * This function is called periodically during operator control.
    */
   @Override
+  public void teleopInit() {
+    // The compressor was started directly in teleopPeriodic() in the 2020 code.
+    // In the 2026 build we enable closed-loop compressor control once on teleop entry.
+    robotContainer.enableCompressor();
+  }
+
+  /**
+   * This function is called periodically during operator control.
+   */
+  @Override
   public void teleopPeriodic() {
-    teleop.periodic();
+  }
 
-    compressor.enableDigital();
-
-    /*if(compressor.getPressureSwitchValue() == false)
-    {
-      compressor.start();
-    }
-    else
-    {
-      compressor.stop();
-    }*/
-  
+  /**
+   * This function is called periodically during test mode.
+   */
+  @Override
+  public void testInit() {
+    CommandScheduler.getInstance().cancelAll();
+    robotContainer.enableCompressor();
   }
 
   /**
@@ -331,7 +185,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    compressor.enableDigital();
     reset();
+  }
+
+  @Override
+  public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
   }
 }

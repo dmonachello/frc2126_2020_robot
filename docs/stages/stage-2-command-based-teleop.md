@@ -268,6 +268,31 @@ Verification:
 1. `./gradlew build` must pass.
 2. Existing `DriveBaseTest` coverage must continue to pass unchanged.
 
+### 2026-09-04 Repository Line Ending Policy Slice
+
+Decision:
+
+1. Add a repository-level `.gitattributes` file.
+2. Store normal text files with `LF` line endings in Git.
+3. Keep Windows launcher scripts such as `.bat` and `.cmd` as `CRLF`.
+
+Why it was handled this way:
+
+1. The project is being taught on Windows systems where `core.autocrlf=true` is common.
+2. Without a repo policy, identical edits can generate distracting line-ending warnings and noisy diffs.
+3. This is a good classroom example of making collaboration rules explicit in version control.
+
+What changed:
+
+1. Added `.gitattributes` at the repository root.
+2. Set a default text normalization policy.
+3. Added explicit Windows exceptions for command launcher files.
+
+Verification:
+
+1. The repository should stop depending on each local machine's Git defaults for text files.
+2. The build should continue to pass unchanged.
+
 ## Student Notes
 
 This is the main architectural teaching stage. It should explain how the existing `TimedRobot` and `Teleop` flow maps into subsystems, default commands, and button bindings.

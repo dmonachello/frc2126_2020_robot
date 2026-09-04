@@ -1,0 +1,9 @@
+# Stage 2 note:
+# This repository is taught and edited primarily on Windows machines, but we still want
+# Git to store a consistent text representation in the repository. Defining the policy here
+# avoids noisy line-ending warnings and keeps diffs stable across student machines.
+* text=auto eol=lf
+
+# Preserve Windows launcher scripts with CRLF so they continue to match platform expectations.
+*.bat text eol=crlf
+*.cmd text eol=crlf

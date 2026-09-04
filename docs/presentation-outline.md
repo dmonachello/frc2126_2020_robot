@@ -142,7 +142,7 @@ Introduce RobotContainer and Subsystems
 Key points:
 
 1. Added `RobotContainer`.
-2. Added subsystem wrappers for drive, climber, ball manipulator, gimbal, and wheel spinner.
+2. Added subsystem wrappers for drive, climber, and ball manipulator.
 3. Moved teleop-owned hardware construction into `RobotContainer`.
 4. Kept the old low-level mechanism classes as the hardware/control layer.
 
@@ -159,7 +159,7 @@ Move Teleop Into Default Commands and Bindings
 
 Key points:
 
-1. Added command classes for drive, climber, ball manipulator, gimbal, and wheel spinner.
+1. Added command classes for drive, climber, and ball manipulator.
 2. Replaced a temporary scheduled teleop loop with subsystem default commands.
 3. Added a `Trigger` plus `InstantCommand` binding for reverse drive.
 4. Kept `Controls` temporarily so students can compare old polling logic with new command-based structure.
@@ -205,7 +205,31 @@ Key points:
 3. The file stays in the repository so students can inspect the original polling-helper design.
 4. This lets the class compare an old but reasonable `TimedRobot` pattern with the command-based replacement.
 
-## Slide 15: Current Stage 2 State
+## Slide 15: Removed 2020 Game-Specific Hardware
+
+Title:
+Remove What Was Not On the Final Robot
+
+Key points:
+
+1. The color sensor was removed in Stage 1 because it never made the final 2020 robot.
+2. The wheel spinner was later removed for the same reason.
+3. This was a hardware-truth correction, not just a code cleanup.
+4. Students should learn to separate architectural migration from confirming what the real robot actually had.
+
+## Slide 16: Remove Unclear Experimental Hardware
+
+Title:
+Do Not Carry Forward Hardware You Cannot Justify
+
+Key points:
+
+1. The gimbal code described a two-servo pan/tilt mechanism, likely intended to move a camera.
+2. The code did not prove that the final robot actually used that mechanism.
+3. Once the hardware purpose could not be justified, the gimbal was removed.
+4. Students should learn that old code can contain experiments that should not be preserved blindly.
+
+## Slide 17: Current Stage 2 State
 
 Title:
 Where the Project Stands Now
@@ -219,7 +243,7 @@ Key points:
 5. The project is still a hybrid transition codebase.
 6. `Teleop.java` and `Controls.java` remain in the tree as teaching references.
 
-## Slide 16: What Changed in the Code Structure
+## Slide 18: What Changed in the Code Structure
 
 Title:
 Old vs New Ownership
@@ -236,7 +260,7 @@ After current Stage 2 checkpoint:
 3. `subsystems/` own mechanism-facing command-based access.
 4. `commands/` own teleop behavior slices.
 
-## Slide 17: Lessons Learned
+## Slide 19: Lessons Learned
 
 Title:
 Migration Lessons
@@ -249,7 +273,7 @@ Key points:
 4. Small compatibility shims can reduce migration risk.
 5. A hybrid intermediate structure is easier to teach than a big-bang rewrite.
 
-## Slide 18: Suggested Student Exercises
+## Slide 20: Suggested Student Exercises
 
 Title:
 Ways Students Can Explore the Project
@@ -262,7 +286,7 @@ Key points:
 4. Identify which classes are still transitional and which are already idiomatic command-based code.
 5. Propose the next slice to continue the migration.
 
-## Slide 19: Retiring Teleop.java
+## Slide 21: Retiring Teleop.java
 
 Title:
 Retire the Old Coordinator Without Losing the Lesson

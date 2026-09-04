@@ -25,7 +25,7 @@ The directory structure should be changed incrementally rather than all at once.
 
 ## Expected Mapping Pattern
 
-1. Existing mechanism classes such as `DriveBase`, `Climber`, `BallManipulator`, `Gimbal`, and `WeelSpinner` start as the hardware/control layer.
+1. Existing mechanism classes such as `DriveBase`, `Climber`, and `BallManipulator` start as the hardware/control layer.
 2. New subsystem classes become the command-based ownership layer.
 3. `Teleop.java` is expected to split into `RobotContainer` bindings and commands.
 4. `Robot.java` should become thinner as initialization and control wiring move into standard command-based locations.
@@ -77,8 +77,6 @@ Planned first actions:
 | `DriveBase` | Drive subsystem hardware/control layer | Wrap first | Medium | Good early candidate for `DriveSubsystem`. |
 | `Climber` | Climber subsystem hardware/control layer | Wrap first | Low | Behavior is simple and should migrate cleanly. |
 | `BallManipulator` | Ball manipulator subsystem hardware/control layer | Wrap first | Medium | Likely splits into intake/outtake commands. |
-| `Gimbal` | Gimbal subsystem hardware/control layer | Wrap first | Medium | Axis control may become default or manual commands. |
-| `WeelSpinner` | Wheel spinner subsystem hardware/control layer | Wrap first | Low | Small mechanism, likely straightforward. |
 | `Controls` | Controller bindings/input translation | Replace gradually | Medium | Likely absorbed into `RobotContainer` bindings. |
 
 ### 2026-09-04 First Command-Based Slice
@@ -88,7 +86,7 @@ Actions taken:
 1. Added the 2026 `WPILibNewCommands` vendordep so command-based classes are available to the project.
 2. Added `RobotContainer` as the new wiring point for teleop hardware and operator controls.
 3. Added initial subsystem wrappers around the existing mechanism classes:
-   `DriveSubsystem`, `ClimberSubsystem`, `BallManipulatorSubsystem`, `GimbalSubsystem`, and `WheelSpinnerSubsystem`.
+   `DriveSubsystem`, `ClimberSubsystem`, and `BallManipulatorSubsystem`.
 4. Moved hardware construction for teleop-owned mechanisms from `Robot` into `RobotContainer`.
 5. Introduced a scheduled teleop command path using `RunCommand` while keeping the existing low-level mechanism classes intact.
 6. Kept the old `Teleop.java` file in the tree as a readable reference during the transition.
@@ -235,7 +233,7 @@ Why it was handled this way:
 What changed:
 
 1. Added `TeleopCommandsTest` under `src/test/java/frc/robot/commands`.
-2. Added focused tests for drive, climber, ball manipulator, gimbal, and wheel spinner teleop commands.
+2. Added focused tests for drive, climber, and ball manipulator teleop commands.
 3. Kept `TeleopTest` in place as historical-reference coverage for the retired polling coordinator.
 
 Verification:
@@ -311,12 +309,62 @@ What changed:
 
 1. Added a package-private `RobotContainer` constructor for tests that injects joysticks and subsystems without creating hardware.
 2. Relaxed selected input-helper methods from `private` to package-private so they can be verified directly by tests in `frc.robot`.
-3. Added `RobotContainerInputTest` to cover drive scaling, climber mapping, reverse detection, belt commands, roller commands, and gimbal/spinner deadband behavior.
+3. Added `RobotContainerInputTest` to cover drive scaling, climber mapping, reverse detection, belt commands, and roller command behavior.
 
 Verification:
 
 1. `./gradlew build` must pass.
 2. The new `RobotContainerInputTest` suite must pass alongside the archived and command-based teleop tests.
+
+### 2026-09-04 Wheel Spinner Removal Slice
+
+Decision:
+
+1. Remove the wheel spinner from both the active runtime path and the archived reference path.
+2. Treat the wheel spinner the same way as the color sensor: it was not part of the final robot hardware.
+3. Update the Stage 2 notes so students can see the difference between architecture cleanup and hardware-truth cleanup.
+
+Why it was handled this way:
+
+1. A wheel spinner without the color-sensor-based game mechanism is not part of the real final robot configuration.
+2. Keeping dead game-specific hardware in the active path would teach the wrong robot history.
+3. The archived `Teleop.java` reference is still useful, but it should reflect the final robot hardware rather than preserve removed mechanisms forever.
+
+What changed:
+
+1. Removed `WheelSpinnerTeleopCommand`, `WheelSpinnerSubsystem`, `WheelSpinner`, and `WeelSpinner`.
+2. Removed spinner construction and scheduling from `RobotContainer`.
+3. Removed spinner-related logic from `Teleop`, `Controls`, `PinOut`, and the related tests.
+
+Verification:
+
+1. `./gradlew build` must pass.
+2. Remaining archived and command-based tests must continue to pass.
+
+### 2026-09-04 Gimbal Removal Slice
+
+Decision:
+
+1. Remove the gimbal from both the active runtime path and the archived reference path.
+2. Treat the gimbal as hardware that does not appear to have been part of the final robot configuration.
+3. Keep the documentation explicit that this was a hardware-truth correction, not a command-based architecture requirement.
+
+Why it was handled this way:
+
+1. The code suggests the gimbal was a manual two-servo pan/tilt mechanism, likely for a camera, but the final robot hardware history does not support keeping it.
+2. Carrying uncertain or abandoned hardware forward into the 2026 command-based robot would teach the wrong system boundary.
+3. Removing unused mechanisms makes the remaining migration work easier to explain and verify.
+
+What changed:
+
+1. Removed `GimbalTeleopCommand`, `GimbalSubsystem`, and `Gimbal`.
+2. Removed gimbal construction and scheduling from `RobotContainer`.
+3. Removed gimbal-related logic from `Teleop`, `Controls`, `PinOut`, and the related tests.
+
+Verification:
+
+1. `./gradlew build` must pass.
+2. Remaining archived and command-based tests must continue to pass.
 
 ## Student Notes
 

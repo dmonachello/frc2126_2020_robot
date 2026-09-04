@@ -14,9 +14,6 @@ public class PinOut
     
     public   int PWMBelt = 5;
     public   int PWMRoller = 4;
-    public   int PWMspinner = 6;                 //--------------------------------------------------
-    public   int PWMServoXAxis = 7;          // Gimbal
-    public   int PWMServoYAxis = 9;          // Gimbal
     public   int CAMpcm = 0;
     public   int CAMpdb = 1;
     public   int ChannelSolenoidLeftForward = 0;
@@ -27,10 +24,6 @@ public class PinOut
     public   int ultrasonicRight = 0;
     public   int ultrasonicLeft = 1;
     
-
-    public   int gimbalXAxisChannel = 2;
-    public   int gimbalYAxisChannel = 3;
-
     public   int leftJoystickNum = 0;
     public   int rightJoystickNum = 1;
 

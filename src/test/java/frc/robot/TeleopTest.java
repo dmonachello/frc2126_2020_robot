@@ -9,8 +9,6 @@ import frc.robot.ballmanipulator.BallManipulator;
 import frc.robot.climber.Climber;
 import frc.robot.controls.Controls;
 import frc.robot.drivebase.DriveBase;
-import frc.robot.weelspinner.WeelSpinner;
-import frc.robot.gimbal.*;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -24,16 +22,14 @@ public class TeleopTest
     private final Climber climber = Mockito.mock(Climber.class);
     private final Controls controls = Mockito.mock(Controls.class);
     private final DriveBase driveBase = Mockito.mock(DriveBase.class);
-    private final WeelSpinner weelSpinner = Mockito.mock(WeelSpinner.class);
     private final BallManipulator ballManipulator = Mockito.mock(BallManipulator.class);
-    private final Gimbal gimbal = Mockito.mock(Gimbal.class);
 
     @Test
     public void testOff()
     {
         final ArgumentCaptor<Double> captor1 = ArgumentCaptor.forClass(Double.class);
         final ArgumentCaptor<Double> captor2 = ArgumentCaptor.forClass(Double.class);
-        Teleop teleop = new Teleop(climber, controls, driveBase, weelSpinner, ballManipulator,gimbal, 1, 1, 1, 0.5);
+        Teleop teleop = new Teleop(climber, controls, driveBase, ballManipulator, 1, 1, 1, 0.5);
         Mockito.when(controls.isRollerOn()).then(x->false);
         Mockito.when(controls.getBeltDirection()).then(x->Controls.BeltDirection.off);
         Mockito.when(controls.climberDirection()).then(x->Controls.ClimberState.down);
@@ -55,7 +51,7 @@ public class TeleopTest
     {
         final ArgumentCaptor<Double> captor1 = ArgumentCaptor.forClass(Double.class);
         final ArgumentCaptor<Double> captor2 = ArgumentCaptor.forClass(Double.class);
-        Teleop teleop = new Teleop(climber, controls, driveBase, weelSpinner, ballManipulator,gimbal, 1, 1, 1, .5);
+        Teleop teleop = new Teleop(climber, controls, driveBase, ballManipulator, 1, 1, 1, .5);
         Mockito.when(controls.isRollerOn()).then(x->true);
         Mockito.when(controls.getBeltDirection()).then(x->Controls.BeltDirection.in);
         Mockito.when(controls.climberDirection()).then(x->Controls.ClimberState.up);
@@ -79,7 +75,7 @@ public class TeleopTest
     {
         final ArgumentCaptor<Double> captor1 = ArgumentCaptor.forClass(Double.class);
         final ArgumentCaptor<Double> captor2 = ArgumentCaptor.forClass(Double.class);
-        Teleop teleop = new Teleop(climber, controls, driveBase, weelSpinner, ballManipulator,gimbal, 1, 1, 1, 0.5);
+        Teleop teleop = new Teleop(climber, controls, driveBase, ballManipulator, 1, 1, 1, 0.5);
         Mockito.when(controls.isRollerOn()).then(x->false);
         Mockito.when(controls.getBeltDirection()).then(x->Controls.BeltDirection.out);
         Mockito.when(controls.climberDirection()).then(x->Controls.ClimberState.down);

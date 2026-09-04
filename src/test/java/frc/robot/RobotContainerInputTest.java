@@ -12,14 +12,10 @@ import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.ballmanipulator.BallManipulator;
 import frc.robot.climber.Climber;
 import frc.robot.drivebase.DriveBase;
-import frc.robot.gimbal.Gimbal;
 import frc.robot.pinout.PinOut;
 import frc.robot.subsystems.BallManipulatorSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.GimbalSubsystem;
-import frc.robot.subsystems.WheelSpinnerSubsystem;
-import frc.robot.weelspinner.WeelSpinner;
 
 // Stage 2 migration note:
 // These tests verify the input-mapping behavior that moved from Controls.java into
@@ -40,11 +36,8 @@ public class RobotContainerInputTest {
 
         DriveSubsystem driveSubsystem = new DriveSubsystem(Mockito.mock(DriveBase.class));
         ClimberSubsystem climberSubsystem = new ClimberSubsystem(Mockito.mock(Climber.class));
-        WheelSpinnerSubsystem wheelSpinnerSubsystem =
-            new WheelSpinnerSubsystem(Mockito.mock(WeelSpinner.class));
         BallManipulatorSubsystem ballManipulatorSubsystem =
             new BallManipulatorSubsystem(Mockito.mock(BallManipulator.class));
-        GimbalSubsystem gimbalSubsystem = new GimbalSubsystem(Mockito.mock(Gimbal.class));
 
         robotContainer = new RobotContainer(
             pinout,
@@ -53,9 +46,7 @@ public class RobotContainerInputTest {
             gamepad,
             driveSubsystem,
             climberSubsystem,
-            wheelSpinnerSubsystem,
-            ballManipulatorSubsystem,
-            gimbalSubsystem);
+            ballManipulatorSubsystem);
     }
 
     @Test
@@ -111,22 +102,6 @@ public class RobotContainerInputTest {
         Mockito.when(joystickRight.getRawButton(pinout.rollerButton)).thenReturn(true);
 
         assertEquals(pinout.rollerSpeed, robotContainer.getRollerCommandSpeed(), 0.0000001);
-    }
-
-    @Test
-    public void spinnerDeadbandReturnsZeroInsideRange() {
-        Mockito.when(gamepad.getRawAxis(0)).thenReturn(0.2);
-
-        assertEquals(0.0, robotContainer.getSpinnerSpeed(), 0.0000001);
-    }
-
-    @Test
-    public void gimbalAxesApplyDeadbandAndYInversion() {
-        Mockito.when(gamepad.getRawAxis(pinout.gimbalXAxisChannel)).thenReturn(0.5);
-        Mockito.when(gamepad.getRawAxis(pinout.gimbalYAxisChannel)).thenReturn(0.5);
-
-        assertEquals(0.5, robotContainer.getGimbalXValue(), 0.0000001);
-        assertEquals(-0.5, robotContainer.getGimbalYValue(), 0.0000001);
     }
 
     @Test

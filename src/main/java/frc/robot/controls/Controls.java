@@ -26,8 +26,6 @@ public class Controls
     private final Joystick gamepad;
     private final int leftDriveAxis;
     private final int rightDriveAxis;
-    private final int gimbalXAxis;
-    private final int gimbalYAxis;
     private final int climberButton;
     private final int reverseButton;
     private final int beltInButton;
@@ -44,8 +42,6 @@ public class Controls
             Joystick gamepad, 
             int leftDriveAxis, 
             int rightDriveAxis,
-            int gimbalXAxis,
-            int gimbalYAxis, 
             int climberButton, 
             int reverseButton,
             int beltInButton,
@@ -58,8 +54,6 @@ public class Controls
         this.gamepad = gamepad;
         this.leftDriveAxis = leftDriveAxis;
         this.rightDriveAxis = rightDriveAxis;
-        this.gimbalXAxis = gimbalXAxis;
-        this.gimbalYAxis = gimbalYAxis;
         this.climberButton = climberButton;
         this.reverseButton = reverseButton;
         this.beltInButton = beltInButton;
@@ -136,19 +130,6 @@ public class Controls
         } 
     }
 
-    public double spinnerSpeed()
-    {
-        return deadZone(gamepad.getRawAxis(0), 0.25);
-    }
-
-    public double gimbalXValue()
-    {
-        return deadZone(gamepad.getRawAxis(gimbalXAxis), 0.25);
-    }
-    public double gimbalYValue()
-    {
-        return deadZone(-gamepad.getRawAxis(gimbalYAxis), 0.25);
-    }
     private static double deadZone(double joystickValue, double range)
     {
         if(Math.abs(joystickValue) <= range)

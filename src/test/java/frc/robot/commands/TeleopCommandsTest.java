@@ -9,13 +9,9 @@ import org.mockito.Mockito;
 import frc.robot.ballmanipulator.BallManipulator;
 import frc.robot.climber.Climber;
 import frc.robot.drivebase.DriveBase;
-import frc.robot.gimbal.Gimbal;
 import frc.robot.subsystems.BallManipulatorSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.GimbalSubsystem;
-import frc.robot.subsystems.WheelSpinnerSubsystem;
-import frc.robot.weelspinner.WeelSpinner;
 
 // Stage 2 migration note:
 // These tests validate the active command-based teleop path. They sit beside TeleopTest so
@@ -70,30 +66,4 @@ public class TeleopCommandsTest {
         Mockito.verify(ballManipulator).intake(1.0);
     }
 
-    @Test
-    public void gimbalTeleopCommandAppliesExpectedScaling() {
-        Gimbal gimbal = Mockito.mock(Gimbal.class);
-        GimbalSubsystem gimbalSubsystem = new GimbalSubsystem(gimbal);
-        GimbalTeleopCommand command = new GimbalTeleopCommand(gimbalSubsystem, () -> 0.5, () -> -0.25);
-
-        command.execute();
-
-        final ArgumentCaptor<Double> horizontalCaptor = ArgumentCaptor.forClass(Double.class);
-        final ArgumentCaptor<Double> verticalCaptor = ArgumentCaptor.forClass(Double.class);
-        Mockito.verify(gimbal).gimbalHorizontalRelative(horizontalCaptor.capture());
-        Mockito.verify(gimbal).gimbalVerticalRelative(verticalCaptor.capture());
-        assertEquals("Horizontal gimbal delta incorrect", 0.005, horizontalCaptor.getValue(), 0.0000001);
-        assertEquals("Vertical gimbal delta incorrect", -0.0025, verticalCaptor.getValue(), 0.0000001);
-    }
-
-    @Test
-    public void wheelSpinnerTeleopCommandUsesSuppliedSpeed() {
-        WeelSpinner wheelSpinner = Mockito.mock(WeelSpinner.class);
-        WheelSpinnerSubsystem wheelSpinnerSubsystem = new WheelSpinnerSubsystem(wheelSpinner);
-        WheelSpinnerTeleopCommand command = new WheelSpinnerTeleopCommand(wheelSpinnerSubsystem, () -> -0.4);
-
-        command.execute();
-
-        Mockito.verify(wheelSpinner).spin(-0.4);
-    }
 }

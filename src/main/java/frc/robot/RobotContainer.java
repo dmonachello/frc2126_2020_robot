@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -20,19 +19,13 @@ import frc.robot.climber.Piston;
 import frc.robot.commands.BallManipulatorTeleopCommand;
 import frc.robot.commands.ClimberTeleopCommand;
 import frc.robot.commands.DriveTeleopCommand;
-import frc.robot.commands.GimbalTeleopCommand;
-import frc.robot.commands.WheelSpinnerTeleopCommand;
 import frc.robot.drivebase.DriveBase;
-import frc.robot.gimbal.Gimbal;
 import frc.robot.motorcontrol.DualMotorController;
 import frc.robot.pinout.PinOut;
 import frc.robot.subsystems.BallManipulatorSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.GimbalSubsystem;
-import frc.robot.subsystems.WheelSpinnerSubsystem;
 import frc.robot.ultrasonic.Ultrasonic;
-import frc.robot.weelspinner.WeelSpinner;
 
 public class RobotContainer {
     private final PinOut pinout;
@@ -41,9 +34,7 @@ public class RobotContainer {
     private final Joystick gamepad;
     private final DriveSubsystem driveSubsystem;
     private final ClimberSubsystem climberSubsystem;
-    private final WheelSpinnerSubsystem wheelSpinnerSubsystem;
     private final BallManipulatorSubsystem ballManipulatorSubsystem;
-    private final GimbalSubsystem gimbalSubsystem;
     private final Ultrasonic ultrasonicRight;
     private final Compressor compressor;
 
@@ -51,10 +42,6 @@ public class RobotContainer {
         // PinOut still owns the original numeric constants so students can compare the
         // migrated command-based structure to the 2020 source without losing the wiring map.
         pinout = new PinOut();
-
-        Servo servoXaxis = new Servo(pinout.PWMServoXAxis);
-        Servo servoYaxis = new Servo(pinout.PWMServoYAxis);
-        gimbalSubsystem = new GimbalSubsystem(new Gimbal(servoXaxis, servoYaxis));
 
         DigitalInput leftLimitSwitch = new DigitalInput(pinout.DIOleftLimitSwitch);
         DigitalInput rightLimitSwitch = new DigitalInput(pinout.DIOrightLimitSwitch);
@@ -104,9 +91,6 @@ public class RobotContainer {
         // Stage 1 compatibility change: 2026 WPILib pneumatics APIs require a module type.
         compressor = new Compressor(pinout.CAMpcm, PneumaticsModuleType.CTREPCM);
 
-        MotorController spinner = new Talon(pinout.PWMspinner);
-        wheelSpinnerSubsystem = new WheelSpinnerSubsystem(new WeelSpinner(spinner));
-
         MotorController speedControllerBelt = new Talon(pinout.PWMBelt);
         MotorController speedControllerRoller = new Talon(pinout.PWMRoller);
         Belts belt = new Belts(speedControllerBelt);
@@ -135,18 +119,14 @@ public class RobotContainer {
         Joystick gamepad,
         DriveSubsystem driveSubsystem,
         ClimberSubsystem climberSubsystem,
-        WheelSpinnerSubsystem wheelSpinnerSubsystem,
-        BallManipulatorSubsystem ballManipulatorSubsystem,
-        GimbalSubsystem gimbalSubsystem) {
+        BallManipulatorSubsystem ballManipulatorSubsystem) {
         this.pinout = pinout;
         this.joystickLeft = joystickLeft;
         this.joystickRight = joystickRight;
         this.gamepad = gamepad;
         this.driveSubsystem = driveSubsystem;
         this.climberSubsystem = climberSubsystem;
-        this.wheelSpinnerSubsystem = wheelSpinnerSubsystem;
         this.ballManipulatorSubsystem = ballManipulatorSubsystem;
-        this.gimbalSubsystem = gimbalSubsystem;
         this.ultrasonicRight = null;
         this.compressor = null;
     }
@@ -163,7 +143,6 @@ public class RobotContainer {
         driveSubsystem.drive(0, 0);
         ballManipulatorSubsystem.intake(0);
         ballManipulatorSubsystem.outtake(0);
-        wheelSpinnerSubsystem.spin(0);
     }
 
     public void drive(double left, double right) {
@@ -197,10 +176,6 @@ public class RobotContainer {
                 ballManipulatorSubsystem,
                 this::getBeltCommandSpeed,
                 this::getRollerCommandSpeed));
-        gimbalSubsystem.setDefaultCommand(
-            new GimbalTeleopCommand(gimbalSubsystem, this::getGimbalXValue, this::getGimbalYValue));
-        wheelSpinnerSubsystem.setDefaultCommand(
-            new WheelSpinnerTeleopCommand(wheelSpinnerSubsystem, this::getSpinnerSpeed));
     }
 
     double getLeftDriveValue() {
@@ -236,18 +211,6 @@ public class RobotContainer {
             return pinout.rollerSpeed;
         }
         return 0;
-    }
-
-    double getSpinnerSpeed() {
-        return deadZone(gamepad.getRawAxis(0), 0.25);
-    }
-
-    double getGimbalXValue() {
-        return deadZone(gamepad.getRawAxis(pinout.gimbalXAxisChannel), 0.25);
-    }
-
-    double getGimbalYValue() {
-        return deadZone(-gamepad.getRawAxis(pinout.gimbalYAxisChannel), 0.25);
     }
 
     double applyDriveScale(double joystickValue, Joystick joystick) {

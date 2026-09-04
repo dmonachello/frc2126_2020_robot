@@ -191,7 +191,7 @@ Key points:
 2. Moved joystick ownership directly into `RobotContainer`.
 3. Updated teleop command classes to use suppliers instead of the legacy helper.
 4. Recreated the old input behavior directly in the command-based wiring layer.
-5. Kept `Controls.java` in the repo as a historical reference for students.
+5. Kept `Controls.java` temporarily in the repo as a historical reference for students.
 
 ## Slide 14: Retiring Controls.java From Runtime Use
 
@@ -202,7 +202,7 @@ Key points:
 
 1. `Controls.java` no longer participates in the active teleop runtime path.
 2. `RobotContainer` now owns the live joystick objects, input interpretation, and bindings.
-3. The file stays in the repository so students can inspect the original polling-helper design.
+3. The file was later moved to `docs/archive/` so students can still inspect the original polling-helper design.
 4. This lets the class compare an old but reasonable `TimedRobot` pattern with the command-based replacement.
 
 ## Slide 15: Removed 2020 Game-Specific Hardware
@@ -240,8 +240,8 @@ Key points:
 2. Tests still pass.
 3. Teleop now uses command-based defaults and bindings.
 4. `RobotContainer` now owns active input handling.
-5. The project is still a hybrid transition codebase.
-6. `Teleop.java` and `Controls.java` remain in the tree as teaching references.
+5. The active source tree now contains only the command-based teleop path plus the remaining autonomous code.
+6. The retired teleop coordinator and helper now live under `docs/archive/`.
 
 ## Slide 18: What Changed in the Code Structure
 
@@ -295,8 +295,8 @@ Key points:
 
 1. `Teleop.java` is no longer used by the active robot runtime.
 2. `RobotContainer`, default commands, and bindings now own teleop behavior.
-3. `Teleop.java` was kept as an archival teaching reference instead of being deleted immediately.
-4. `TeleopTest` now acts as a behavior reference for the old polling model.
+3. `Teleop.java`, `Controls.java`, and `TeleopTest.java` were moved into `docs/archive/` once Stage 2 no longer needed them in the build.
+4. The command-based tests now own coverage for the active teleop path.
 
 Teaching note:
 

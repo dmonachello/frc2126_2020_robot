@@ -45,6 +45,7 @@ Maintain a mapping table during Stage 2 that records:
 1. Teleop runs through command-based structure.
 2. Build remains clean with no warnings.
 3. Subsystem ownership and command boundaries are documented.
+4. Retired teleop coordinator classes are archived outside the active source tree.
 
 ## Notes
 
@@ -89,7 +90,7 @@ Actions taken:
    `DriveSubsystem`, `ClimberSubsystem`, and `BallManipulatorSubsystem`.
 4. Moved hardware construction for teleop-owned mechanisms from `Robot` into `RobotContainer`.
 5. Introduced a scheduled teleop command path using `RunCommand` while keeping the existing low-level mechanism classes intact.
-6. Kept the old `Teleop.java` file in the tree as a readable reference during the transition.
+6. Kept the old `Teleop.java` file in the tree temporarily as a readable reference during the transition.
 
 Why this slice:
 
@@ -101,7 +102,7 @@ Expected follow-up work:
 
 1. Replace the single scheduled teleop cycle with more idiomatic default commands and bindings.
 2. Move more responsibility from the transition layer into commands and subsystem methods.
-3. Decide when `Teleop.java` can be removed after the new structure is proven stable.
+3. Decide when `Teleop.java` can be removed from `src/` and archived after the new structure is proven stable.
 
 Verification:
 
@@ -155,7 +156,7 @@ Actions taken:
 2. Moved joystick ownership directly into `RobotContainer`.
 3. Changed the teleop command classes to accept suppliers rather than the old `Controls` helper.
 4. Recreated the old axis scaling, deadband, and button mapping logic inside `RobotContainer`.
-5. Kept `Controls.java` in the repo as a documented historical reference.
+5. Kept `Controls.java` in the repo temporarily as a documented historical reference.
 
 Verification:
 
@@ -170,19 +171,19 @@ Decision:
 
 1. `Teleop.java` is no longer part of the active runtime path.
 2. The active teleop path now runs through `RobotContainer`, subsystem default commands, and bindings.
-3. Instead of deleting `Teleop.java` immediately, it remains in the repository as an archival teaching reference.
+3. Instead of deleting `Teleop.java` immediately, it remained in the repository as an interim archival teaching reference.
 
 Why it was handled this way:
 
 1. Students can still read the original 2020 teleop coordinator beside the new command-based structure.
-2. The existing `TeleopTest` suite still provides an executable reference for the old polling logic.
+2. The existing `TeleopTest` suite temporarily preserved an executable reference for the old polling logic.
 3. Keeping the file temporarily makes the before/after comparison easier during instruction.
 
 What changed:
 
 1. Added archival comments to `Teleop.java`.
 2. Added a matching historical note to `TeleopTest.java`.
-3. Documented that the command-based path has fully replaced `Teleop.java` at runtime.
+3. Documented that the command-based path had fully replaced `Teleop.java` at runtime.
 
 Verification:
 
@@ -197,7 +198,7 @@ Decision:
 
 1. `Controls.java` is no longer part of the active teleop path.
 2. `RobotContainer` now owns the live controller objects, deadband handling, button mapping, and reverse-drive binding.
-3. `Controls.java` remains in the repository as an archival teaching reference instead of being deleted immediately.
+3. `Controls.java` remained in the repository temporarily as an archival teaching reference instead of being deleted immediately.
 
 Why it was handled this way:
 
@@ -209,7 +210,7 @@ What changed:
 
 1. Added stronger archival comments to `Controls.java`.
 2. Documented that the class is kept for comparison, not for active runtime use.
-3. Preserved the file unchanged functionally so the old design remains readable for instruction.
+3. Preserved the file unchanged functionally for a teaching window before final archiving.
 
 Verification:
 
@@ -220,7 +221,7 @@ Verification:
 
 Decision:
 
-1. Keep `TeleopTest` as executable coverage for the archived 2020 polling design.
+1. Keep `TeleopTest` temporarily as executable coverage for the archived 2020 polling design.
 2. Add a separate command-based test suite for the active Stage 2 teleop path.
 3. Test each teleop command at the command/subsystem seam instead of trying to integration-test `RobotContainer` hardware construction.
 
@@ -234,12 +235,12 @@ What changed:
 
 1. Added `TeleopCommandsTest` under `src/test/java/frc/robot/commands`.
 2. Added focused tests for drive, climber, and ball manipulator teleop commands.
-3. Kept `TeleopTest` in place as historical-reference coverage for the retired polling coordinator.
+3. Kept `TeleopTest` in place temporarily as historical-reference coverage for the retired polling coordinator.
 
 Verification:
 
 1. `./gradlew build` must pass.
-2. Both the archived `TeleopTest` suite and the new command-based tests must pass.
+2. Both the temporary `TeleopTest` suite and the new command-based tests must pass.
 
 ### 2026-09-04 DriveBase Helper Cleanup Slice
 
@@ -307,7 +308,7 @@ Why it was handled this way:
 
 What changed:
 
-1. Added a package-private `RobotContainer` constructor for tests that injects joysticks and subsystems without creating hardware.
+1. Added regression tests around `RobotContainer` behavior.
 2. Relaxed selected input-helper methods from `private` to package-private so they can be verified directly by tests in `frc.robot`.
 3. Added `RobotContainerInputTest` to cover drive scaling, climber mapping, reverse detection, belt commands, and roller command behavior.
 
@@ -339,7 +340,7 @@ What changed:
 Verification:
 
 1. `./gradlew build` must pass.
-2. Remaining archived and command-based tests must continue to pass.
+2. Remaining active and command-based tests must continue to pass.
 
 ### 2026-09-04 Gimbal Removal Slice
 
@@ -364,7 +365,84 @@ What changed:
 Verification:
 
 1. `./gradlew build` must pass.
-2. Remaining archived and command-based tests must continue to pass.
+2. Remaining active and command-based tests must continue to pass.
+
+### 2026-09-04 Teleop Archive Closeout Slice
+
+Decision:
+
+1. Remove `Teleop.java`, `Controls.java`, and `TeleopTest.java` from the compiled source tree.
+2. Preserve their teaching value under `docs/archive/` instead of keeping dead Java classes in `src/`.
+3. Treat this as the Stage 2 cleanup step that ends the hybrid teleop transition.
+
+Why it was handled this way:
+
+1. By this point the active robot no longer used the old polling coordinator or its helper.
+2. Leaving dead runtime classes in `src/main/java` would blur the final command-based architecture.
+3. Moving them into Markdown keeps the history available without letting old code shape the active project.
+
+What changed:
+
+1. Archived `Teleop.java` into `docs/archive/teleop-2020-reference.md`.
+2. Archived `Controls.java` into `docs/archive/controls-2020-reference.md`.
+3. Archived `TeleopTest.java` into `docs/archive/teleop-test-2020-reference.md`.
+4. Removed the old Java source and test files from the active build.
+5. Updated the documentation index and migration spec to point at the archive material.
+
+Verification:
+
+1. `./gradlew build` must pass.
+2. The active command-based tests must continue to pass without the old polling classes in the build.
+
+### 2026-09-04 RobotContainer Scheduler Regression Slice
+
+Decision:
+
+1. Add scheduler-level regression tests around `RobotContainer`.
+2. Keep the existing command tests and input-mapping tests, then add one higher-level layer above them.
+3. Avoid test-only hooks in `RobotContainer` by injecting a hardware bundle instead.
+
+Why it was handled this way:
+
+1. The old `TeleopTest` verified one coordinator end to end, and Stage 2 needed an equivalent confidence layer for the command-based replacement.
+2. Command-level tests alone do not prove that `RobotContainer` actually installs the right defaults and bindings.
+3. This gives students a clean example of testing command-based wiring without leaving test-only methods in runtime code.
+
+What changed:
+
+1. Added `RobotContainerSchedulerTest` to run `CommandScheduler` against the active teleop wiring.
+2. Introduced `RobotHardware` so production hardware construction is separated from `RobotContainer` behavior wiring.
+3. Covered both default-command execution and the reverse-drive binding through the scheduler.
+
+### 2026-09-04 Runtime/Test Separation Cleanup Slice
+
+Decision:
+
+1. Remove test-specific seams from `RobotContainer`.
+2. Separate concrete WPILib construction into a production `RobotHardware` boundary.
+3. Keep fake hardware setup entirely inside test code.
+
+Why it was handled this way:
+
+1. New students should not have to read `for testing` methods in the active robot container.
+2. A real construction boundary is a better design than a test-only hook.
+3. This keeps regression tests strong without letting tests shape the runtime API unnecessarily.
+
+What changed:
+
+1. Added `RobotHardware` to build the real robot hardware bundle.
+2. Changed `RobotContainer` to consume `RobotHardware` instead of constructing everything inline.
+3. Updated regression tests to inject fake `RobotHardware` objects from `src/test/java`.
+
+Verification:
+
+1. `./gradlew build` must pass.
+2. The scheduler-level and input-mapping regression tests must still pass.
+
+Verification:
+
+1. `./gradlew build` must pass.
+2. The new scheduler-level tests must pass alongside the existing command and input tests.
 
 ## Student Notes
 

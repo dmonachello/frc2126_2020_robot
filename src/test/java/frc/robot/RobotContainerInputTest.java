@@ -39,14 +39,17 @@ public class RobotContainerInputTest {
         BallManipulatorSubsystem ballManipulatorSubsystem =
             new BallManipulatorSubsystem(Mockito.mock(BallManipulator.class));
 
-        robotContainer = new RobotContainer(
+        RobotHardware hardware = new RobotHardware(
             pinout,
             joystickLeft,
             joystickRight,
             gamepad,
             driveSubsystem,
             climberSubsystem,
-            ballManipulatorSubsystem);
+            ballManipulatorSubsystem,
+            null,
+            null);
+        robotContainer = new RobotContainer(hardware);
     }
 
     @Test

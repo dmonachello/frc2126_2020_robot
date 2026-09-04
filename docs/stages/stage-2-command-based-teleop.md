@@ -293,6 +293,31 @@ Verification:
 1. The repository should stop depending on each local machine's Git defaults for text files.
 2. The build should continue to pass unchanged.
 
+### 2026-09-04 RobotContainer Input Test Slice
+
+Decision:
+
+1. Add unit tests for the input-mapping logic that moved from `Controls.java` into `RobotContainer`.
+2. Add a small package-private test seam in `RobotContainer` instead of using reflection.
+3. Keep the production constructor unchanged for the real robot path.
+
+Why it was handled this way:
+
+1. The migrated input logic is now one of the most important behavior-preservation points in Stage 2.
+2. A test seam is easier for students to read and discuss than reflection-based test code.
+3. This shows that command-based migration still needs direct tests around control interpretation, not just command execution tests.
+
+What changed:
+
+1. Added a package-private `RobotContainer` constructor for tests that injects joysticks and subsystems without creating hardware.
+2. Relaxed selected input-helper methods from `private` to package-private so they can be verified directly by tests in `frc.robot`.
+3. Added `RobotContainerInputTest` to cover drive scaling, climber mapping, reverse detection, belt commands, roller commands, and gimbal/spinner deadband behavior.
+
+Verification:
+
+1. `./gradlew build` must pass.
+2. The new `RobotContainerInputTest` suite must pass alongside the archived and command-based teleop tests.
+
 ## Student Notes
 
 This is the main architectural teaching stage. It should explain how the existing `TimedRobot` and `Teleop` flow maps into subsystems, default commands, and button bindings.

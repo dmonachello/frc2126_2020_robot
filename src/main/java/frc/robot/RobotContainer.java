@@ -124,6 +124,33 @@ public class RobotContainer {
         configureBindings();
     }
 
+    // Stage 2 test seam:
+    // The active robot uses the hardware-building constructor above. This package-private
+    // constructor exists so unit tests can verify the input-mapping logic that replaced
+    // Controls.java without creating real WPILib hardware objects.
+    RobotContainer(
+        PinOut pinout,
+        Joystick joystickLeft,
+        Joystick joystickRight,
+        Joystick gamepad,
+        DriveSubsystem driveSubsystem,
+        ClimberSubsystem climberSubsystem,
+        WheelSpinnerSubsystem wheelSpinnerSubsystem,
+        BallManipulatorSubsystem ballManipulatorSubsystem,
+        GimbalSubsystem gimbalSubsystem) {
+        this.pinout = pinout;
+        this.joystickLeft = joystickLeft;
+        this.joystickRight = joystickRight;
+        this.gamepad = gamepad;
+        this.driveSubsystem = driveSubsystem;
+        this.climberSubsystem = climberSubsystem;
+        this.wheelSpinnerSubsystem = wheelSpinnerSubsystem;
+        this.ballManipulatorSubsystem = ballManipulatorSubsystem;
+        this.gimbalSubsystem = gimbalSubsystem;
+        this.ultrasonicRight = null;
+        this.compressor = null;
+    }
+
     public void enableCompressor() {
         compressor.enableDigital();
     }
@@ -176,24 +203,24 @@ public class RobotContainer {
             new WheelSpinnerTeleopCommand(wheelSpinnerSubsystem, this::getSpinnerSpeed));
     }
 
-    private double getLeftDriveValue() {
+    double getLeftDriveValue() {
         return applyDriveScale(-joystickLeft.getRawAxis(pinout.leftDriveAxis), joystickLeft);
     }
 
-    private double getRightDriveValue() {
+    double getRightDriveValue() {
         return applyDriveScale(-joystickRight.getRawAxis(pinout.rightDriveAxis), joystickRight);
     }
 
-    private boolean isClimberUpRequested() {
+    boolean isClimberUpRequested() {
         return gamepad.getRawButton(pinout.climberButton);
     }
 
-    private boolean isReversePressed() {
+    boolean isReversePressed() {
         return joystickLeft.getRawButtonPressed(pinout.reverseButton)
             || joystickRight.getRawButtonPressed(pinout.reverseButton);
     }
 
-    private double getBeltCommandSpeed() {
+    double getBeltCommandSpeed() {
         if (gamepad.getRawButton(pinout.beltInButton)) {
             return pinout.beltSpeed;
         }
@@ -203,7 +230,7 @@ public class RobotContainer {
         return 0;
     }
 
-    private double getRollerCommandSpeed() {
+    double getRollerCommandSpeed() {
         if (joystickLeft.getRawButton(pinout.rollerButton)
             || joystickRight.getRawButton(pinout.rollerButton)) {
             return pinout.rollerSpeed;
@@ -211,19 +238,19 @@ public class RobotContainer {
         return 0;
     }
 
-    private double getSpinnerSpeed() {
+    double getSpinnerSpeed() {
         return deadZone(gamepad.getRawAxis(0), 0.25);
     }
 
-    private double getGimbalXValue() {
+    double getGimbalXValue() {
         return deadZone(gamepad.getRawAxis(pinout.gimbalXAxisChannel), 0.25);
     }
 
-    private double getGimbalYValue() {
+    double getGimbalYValue() {
         return deadZone(-gamepad.getRawAxis(pinout.gimbalYAxisChannel), 0.25);
     }
 
-    private double applyDriveScale(double joystickValue, Joystick joystick) {
+    double applyDriveScale(double joystickValue, Joystick joystick) {
         if (joystick.getRawButton(pinout.driveSlowButton)) {
             return joystickValue * pinout.slowValue;
         }

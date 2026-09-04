@@ -22,7 +22,7 @@ Preserve the project in its original pre-migration form before any 2026 upgrade 
 ## What Changed
 
 1. Created the local baseline commit.
-2. Created and pushed the GitHub repository `dmonachello/frc2186Robot`.
+2. Created and pushed the GitHub repository `dmonachello/frc2126_2020_robot`.
 3. Preserved the agreed spec file in the baseline.
 
 ## Student Notes

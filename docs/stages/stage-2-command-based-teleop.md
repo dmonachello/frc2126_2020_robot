@@ -48,7 +48,38 @@ Maintain a mapping table during Stage 2 that records:
 
 ## Notes
 
-No migration work recorded yet.
+### 2026-09-04 Stage 2 Kickoff
+
+Starting point:
+
+1. Stage 1 has completed successfully.
+2. The project builds successfully on the 2026 WPILib toolchain.
+3. Existing unit tests pass.
+4. The robot code is still structured as a `TimedRobot` project with a hand-written `Teleop` coordinator.
+
+Initial Stage 2 goal:
+
+Introduce the standard command-based scaffolding without changing teleop behavior yet.
+
+Planned first actions:
+
+1. Add `RobotContainer`.
+2. Add initial `subsystems` and `commands` package structure.
+3. Create a class-mapping table from the current structure into the command-based structure.
+4. Keep the existing teleop flow working while the new structure is introduced alongside it.
+
+## Class Mapping Table
+
+| Current class | Planned command-based role | Migration decision | Behavior risk | Notes |
+| --- | --- | --- | --- | --- |
+| `Robot` | Thin lifecycle shell | Shrink | Medium | Initialization and binding logic should move out over time. |
+| `Teleop` | Split into bindings and commands | Replace gradually | High | This is the main Stage 2 teaching target. |
+| `DriveBase` | Drive subsystem hardware/control layer | Wrap first | Medium | Good early candidate for `DriveSubsystem`. |
+| `Climber` | Climber subsystem hardware/control layer | Wrap first | Low | Behavior is simple and should migrate cleanly. |
+| `BallManipulator` | Ball manipulator subsystem hardware/control layer | Wrap first | Medium | Likely splits into intake/outtake commands. |
+| `Gimbal` | Gimbal subsystem hardware/control layer | Wrap first | Medium | Axis control may become default or manual commands. |
+| `WeelSpinner` | Wheel spinner subsystem hardware/control layer | Wrap first | Low | Small mechanism, likely straightforward. |
+| `Controls` | Controller bindings/input translation | Replace gradually | Medium | Likely absorbed into `RobotContainer` bindings. |
 
 ## Student Notes
 

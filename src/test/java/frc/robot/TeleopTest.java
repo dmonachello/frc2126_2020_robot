@@ -5,8 +5,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.SpeedController;
 import frc.robot.ballmanipulator.BallManipulator;
 import frc.robot.climber.Climber;
 import frc.robot.controls.Controls;
@@ -15,7 +13,6 @@ import frc.robot.weelspinner.WeelSpinner;
 import frc.robot.gimbal.*;
 
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mockito;
 
 public class TeleopTest

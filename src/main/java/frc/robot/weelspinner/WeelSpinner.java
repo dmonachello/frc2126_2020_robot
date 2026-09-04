@@ -1,12 +1,12 @@
 package frc.robot.weelspinner;
 
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 public class WeelSpinner
 {
-    private final SpeedController spinner;
+    private final MotorController spinner;
 
-    public WeelSpinner (SpeedController spinner)
+    public WeelSpinner (MotorController spinner)
     {
         this.spinner = spinner;
     }

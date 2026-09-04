@@ -2,7 +2,7 @@ package frc.robot.drivebase;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 public class DriveBase
 {
@@ -11,8 +11,8 @@ public class DriveBase
         public double left;
         public double right;
     }
-    private SpeedController speedControllerLeft;
-    private SpeedController speedControllerRight;
+    private MotorController speedControllerLeft;
+    private MotorController speedControllerRight;
     private Encoder encoderLeft;
     private Encoder encoderRight;
     private boolean reverse;
@@ -22,8 +22,8 @@ public class DriveBase
 
     private final boolean leftLimitSwitchTrippedValue;
     private final boolean rightLimitSwitchTrippedValue;
-    public DriveBase (SpeedController speedControllerLeft,
-    SpeedController speedControllerRight,
+    public DriveBase (MotorController speedControllerLeft,
+    MotorController speedControllerRight,
      Encoder encoderLeft,
      Encoder encoderRight,
       boolean rightDriveForward,

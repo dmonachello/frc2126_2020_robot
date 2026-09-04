@@ -1,15 +1,6 @@
 package frc.robot.climber;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.SpeedController;
-
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 public class ClimberTest

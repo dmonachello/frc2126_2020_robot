@@ -1,11 +1,11 @@
 package frc.robot.ballmanipulator;
 
-import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 public class Belts
 {
-    private final SpeedController  speedController;
-    public Belts(SpeedController speedController)
+    private final MotorController speedController;
+    public Belts(MotorController speedController)
     {
         this.speedController = speedController;
     }

@@ -1,11 +1,17 @@
 package frc.robot.controls;
 
-import javax.print.attribute.standard.JobHoldUntil;
-
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController.Button;
-import frc.robot.pinout.PinOut.*;
 
+// Historical note:
+// In the original 2020 code this class centralized joystick axes, button numbers,
+// deadband handling, and a few "meaningful" robot actions such as reverse drive.
+// That made sense in a TimedRobot design because Teleop.java needed one polling helper
+// that turned raw joystick state into higher-level intent.
+//
+// During Stage 2 on September 4, 2026, teleop ownership started moving into
+// RobotContainer, commands, and command bindings. This file is intentionally kept in the
+// repository as a teaching reference so students can compare the old polling model to the
+// newer command-based structure.
 public class Controls
 {
     public static enum BeltDirection {off,in,out}

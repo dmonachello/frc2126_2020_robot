@@ -137,6 +137,35 @@ Verification:
 3. Existing unit tests passed.
 4. No build warnings were emitted.
 
+### 2026-09-04 Direct RobotContainer Input Slice
+
+Why `Controls` existed:
+
+1. In the original 2020 design, `Teleop.java` needed one polling helper that translated raw joystick axes and button numbers into robot actions.
+2. `Controls.java` centralized deadband handling, slow-mode scaling, reverse-drive detection, and button-to-action mapping.
+3. That design fit a `TimedRobot` teleop loop, where one class repeatedly polled everything each cycle.
+
+Why it changed:
+
+1. In a standard command-based robot, `RobotContainer` is the normal place to own controllers, bindings, and input interpretation.
+2. Keeping `Controls` in the active path would preserve old structure that students ultimately need to move beyond.
+3. Moving input handling into `RobotContainer` makes the code closer to modern WPILib examples while keeping the behavior readable.
+
+Actions taken:
+
+1. Removed `Controls` from the active Stage 2 teleop path.
+2. Moved joystick ownership directly into `RobotContainer`.
+3. Changed the teleop command classes to accept suppliers rather than the old `Controls` helper.
+4. Recreated the old axis scaling, deadband, and button mapping logic inside `RobotContainer`.
+5. Kept `Controls.java` in the repo as a documented historical reference.
+
+Verification:
+
+1. Ran `./gradlew build`.
+2. The project built successfully.
+3. Existing unit tests passed.
+4. No build warnings were emitted.
+
 ## Student Notes
 
 This is the main architectural teaching stage. It should explain how the existing `TimedRobot` and `Teleop` flow maps into subsystems, default commands, and button bindings.

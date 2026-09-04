@@ -22,7 +22,6 @@ import frc.robot.commands.ClimberTeleopCommand;
 import frc.robot.commands.DriveTeleopCommand;
 import frc.robot.commands.GimbalTeleopCommand;
 import frc.robot.commands.WheelSpinnerTeleopCommand;
-import frc.robot.controls.Controls;
 import frc.robot.drivebase.DriveBase;
 import frc.robot.gimbal.Gimbal;
 import frc.robot.motorcontrol.DualMotorController;
@@ -37,7 +36,9 @@ import frc.robot.weelspinner.WeelSpinner;
 
 public class RobotContainer {
     private final PinOut pinout;
-    private final Controls controls;
+    private final Joystick joystickLeft;
+    private final Joystick joystickRight;
+    private final Joystick gamepad;
     private final DriveSubsystem driveSubsystem;
     private final ClimberSubsystem climberSubsystem;
     private final WheelSpinnerSubsystem wheelSpinnerSubsystem;
@@ -79,26 +80,12 @@ public class RobotContainer {
             pinout.leftLimitSwitchTrippedValue,
             pinout.rightLimitSwitchTrippedValue));
 
-        Joystick joystickLeft = new Joystick(pinout.leftJoystickNum);
-        Joystick joystickRight = new Joystick(pinout.rightJoystickNum);
-        Joystick gamepad = new Joystick(pinout.gamepadNum);
-        controls = new Controls(
-            joystickLeft,
-            joystickRight,
-            gamepad,
-            pinout.leftDriveAxis,
-            pinout.rightDriveAxis,
-            pinout.gimbalXAxisChannel,
-            pinout.gimbalYAxisChannel,
-            pinout.climberButton,
-            pinout.reverseButton,
-            pinout.beltInButton,
-            pinout.beltOutButton,
-            pinout.rollerButton,
-            pinout.driveSlowButton);
-        // Stage 2 transition note: Controls is still the old polling/input translation layer.
-        // It remains in place temporarily so the new command-based code can preserve behavior
-        // while students compare the old and new structures side by side.
+        joystickLeft = new Joystick(pinout.leftJoystickNum);
+        joystickRight = new Joystick(pinout.rightJoystickNum);
+        gamepad = new Joystick(pinout.gamepadNum);
+        // Stage 2 change on September 4, 2026:
+        // joystick ownership moved directly into RobotContainer. This is closer to standard
+        // WPILib command-based structure and removes Controls from the active teleop path.
 
         DoubleSolenoid leftSolenoid = new DoubleSolenoid(
             pinout.CAMpcm,
@@ -166,25 +153,87 @@ public class RobotContainer {
 
     private void configureBindings() {
         // This is the first real button-style command binding migrated out of Teleop.periodic().
-        new Trigger(controls::isReverse)
+        new Trigger(this::isReversePressed)
             .onTrue(new InstantCommand(driveSubsystem::reverseDrive, driveSubsystem));
     }
 
     private void configureDefaultCommands() {
         // Each default command mirrors one slice of the old Teleop.periodic() coordinator.
+        // Stage 2 change: RobotContainer now supplies interpreted joystick values directly
+        // instead of routing them through the legacy Controls helper.
         driveSubsystem.setDefaultCommand(
-            new DriveTeleopCommand(driveSubsystem, controls, pinout.normalValue, pinout.slowValue));
+            new DriveTeleopCommand(driveSubsystem, this::getLeftDriveValue, this::getRightDriveValue));
         climberSubsystem.setDefaultCommand(
-            new ClimberTeleopCommand(climberSubsystem, controls));
+            new ClimberTeleopCommand(climberSubsystem, this::isClimberUpRequested));
         ballManipulatorSubsystem.setDefaultCommand(
             new BallManipulatorTeleopCommand(
                 ballManipulatorSubsystem,
-                controls,
-                pinout.beltSpeed,
-                pinout.rollerSpeed));
+                this::getBeltCommandSpeed,
+                this::getRollerCommandSpeed));
         gimbalSubsystem.setDefaultCommand(
-            new GimbalTeleopCommand(gimbalSubsystem, controls));
+            new GimbalTeleopCommand(gimbalSubsystem, this::getGimbalXValue, this::getGimbalYValue));
         wheelSpinnerSubsystem.setDefaultCommand(
-            new WheelSpinnerTeleopCommand(wheelSpinnerSubsystem, controls));
+            new WheelSpinnerTeleopCommand(wheelSpinnerSubsystem, this::getSpinnerSpeed));
+    }
+
+    private double getLeftDriveValue() {
+        return applyDriveScale(-joystickLeft.getRawAxis(pinout.leftDriveAxis), joystickLeft);
+    }
+
+    private double getRightDriveValue() {
+        return applyDriveScale(-joystickRight.getRawAxis(pinout.rightDriveAxis), joystickRight);
+    }
+
+    private boolean isClimberUpRequested() {
+        return gamepad.getRawButton(pinout.climberButton);
+    }
+
+    private boolean isReversePressed() {
+        return joystickLeft.getRawButtonPressed(pinout.reverseButton)
+            || joystickRight.getRawButtonPressed(pinout.reverseButton);
+    }
+
+    private double getBeltCommandSpeed() {
+        if (gamepad.getRawButton(pinout.beltInButton)) {
+            return pinout.beltSpeed;
+        }
+        if (gamepad.getRawButton(pinout.beltOutButton)) {
+            return -pinout.beltSpeed;
+        }
+        return 0;
+    }
+
+    private double getRollerCommandSpeed() {
+        if (joystickLeft.getRawButton(pinout.rollerButton)
+            || joystickRight.getRawButton(pinout.rollerButton)) {
+            return pinout.rollerSpeed;
+        }
+        return 0;
+    }
+
+    private double getSpinnerSpeed() {
+        return deadZone(gamepad.getRawAxis(0), 0.25);
+    }
+
+    private double getGimbalXValue() {
+        return deadZone(gamepad.getRawAxis(pinout.gimbalXAxisChannel), 0.25);
+    }
+
+    private double getGimbalYValue() {
+        return deadZone(-gamepad.getRawAxis(pinout.gimbalYAxisChannel), 0.25);
+    }
+
+    private double applyDriveScale(double joystickValue, Joystick joystick) {
+        if (joystick.getRawButton(pinout.driveSlowButton)) {
+            return joystickValue * pinout.slowValue;
+        }
+        return joystickValue * pinout.normalValue;
+    }
+
+    private static double deadZone(double joystickValue, double range) {
+        if (Math.abs(joystickValue) <= range) {
+            return 0.0;
+        }
+        return joystickValue;
     }
 }

@@ -1,7 +1,8 @@
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import frc.robot.controls.Controls;
 import frc.robot.subsystems.DriveSubsystem;
 
 // Stage 2 migration note:
@@ -9,29 +10,12 @@ import frc.robot.subsystems.DriveSubsystem;
 public class DriveTeleopCommand extends RunCommand {
     public DriveTeleopCommand(
         DriveSubsystem driveSubsystem,
-        Controls controls,
-        double normalValue,
-        double slowValue) {
+        DoubleSupplier leftDriveSupplier,
+        DoubleSupplier rightDriveSupplier) {
         super(
-            // Preserve the original left/right tank drive calculation from the 2020 teleop loop.
-            () -> driveSubsystem.drive(
-                driveValue(controls.getLeftDrive(), controls.leftSpeed(), normalValue, slowValue),
-                driveValue(controls.getRightDrive(), controls.rightSpeed(), normalValue, slowValue)),
+            // Stage 2 change: RobotContainer now owns joystick interpretation directly instead
+            // of routing it through the old Controls helper.
+            () -> driveSubsystem.drive(leftDriveSupplier.getAsDouble(), rightDriveSupplier.getAsDouble()),
             driveSubsystem);
-    }
-
-    private static double driveValue(
-        double joystickValue,
-        Controls.DriveSpeed speed,
-        double normalValue,
-        double slowValue) {
-        switch (speed) {
-            case normal:
-                return joystickValue * normalValue;
-            case slow:
-                return joystickValue * slowValue;
-            default:
-                return joystickValue;
-        }
     }
 }

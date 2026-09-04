@@ -105,6 +105,16 @@ Requirements:
 3. Move hardware ownership and control responsibilities into standard command-based roles.
 4. Make the structure teachable to students who are learning modern WPILib patterns.
 
+Directory and Package Transition Rule:
+
+The project structure should change gradually during Stage 2 rather than through a single large reorganization.
+
+1. Introduce `RobotContainer`, `subsystems`, and `commands` alongside the existing package layout.
+2. Keep the current mechanism classes working while the new command-based structure is introduced.
+3. Move responsibilities gradually before removing or shrinking older coordinator classes.
+4. Prefer wrapping existing classes in early subsystem implementations instead of rewriting all logic at once.
+5. Document how each old class maps to its new command-based role.
+
 Exit Criteria:
 
 1. Teleop uses standard command-based structure.
@@ -174,6 +184,7 @@ Suggested documentation set:
 3. A blocker log for dependency and API issues
 4. Student-facing concept notes
 5. A presentation outline that can later become PowerPoint slides
+6. A class-mapping record showing how old files move into the command-based structure
 
 ## Student-Facing Expectations
 

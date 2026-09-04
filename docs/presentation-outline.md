@@ -193,7 +193,19 @@ Key points:
 4. Recreated the old input behavior directly in the command-based wiring layer.
 5. Kept `Controls.java` in the repo as a historical reference for students.
 
-## Slide 14: Current Stage 2 State
+## Slide 14: Retiring Controls.java From Runtime Use
+
+Title:
+Keep the Input Helper as Evidence, Not Active Code
+
+Key points:
+
+1. `Controls.java` no longer participates in the active teleop runtime path.
+2. `RobotContainer` now owns the live joystick objects, input interpretation, and bindings.
+3. The file stays in the repository so students can inspect the original polling-helper design.
+4. This lets the class compare an old but reasonable `TimedRobot` pattern with the command-based replacement.
+
+## Slide 15: Current Stage 2 State
 
 Title:
 Where the Project Stands Now
@@ -207,7 +219,7 @@ Key points:
 5. The project is still a hybrid transition codebase.
 6. `Teleop.java` and `Controls.java` remain in the tree as teaching references.
 
-## Slide 15: What Changed in the Code Structure
+## Slide 16: What Changed in the Code Structure
 
 Title:
 Old vs New Ownership
@@ -224,7 +236,7 @@ After current Stage 2 checkpoint:
 3. `subsystems/` own mechanism-facing command-based access.
 4. `commands/` own teleop behavior slices.
 
-## Slide 16: Lessons Learned
+## Slide 17: Lessons Learned
 
 Title:
 Migration Lessons
@@ -237,7 +249,7 @@ Key points:
 4. Small compatibility shims can reduce migration risk.
 5. A hybrid intermediate structure is easier to teach than a big-bang rewrite.
 
-## Slide 17: Suggested Student Exercises
+## Slide 18: Suggested Student Exercises
 
 Title:
 Ways Students Can Explore the Project
@@ -250,7 +262,7 @@ Key points:
 4. Identify which classes are still transitional and which are already idiomatic command-based code.
 5. Propose the next slice to continue the migration.
 
-## Slide 18: Retiring Teleop.java
+## Slide 19: Retiring Teleop.java
 
 Title:
 Retire the Old Coordinator Without Losing the Lesson

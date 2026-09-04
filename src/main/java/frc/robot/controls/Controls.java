@@ -8,10 +8,14 @@ import edu.wpi.first.wpilibj.Joystick;
 // That made sense in a TimedRobot design because Teleop.java needed one polling helper
 // that turned raw joystick state into higher-level intent.
 //
-// During Stage 2 on September 4, 2026, teleop ownership started moving into
-// RobotContainer, commands, and command bindings. This file is intentionally kept in the
-// repository as a teaching reference so students can compare the old polling model to the
-// newer command-based structure.
+// Stage 2 migration note on September 4, 2026:
+// This class is no longer used by the active runtime path. RobotContainer now owns
+// joystick construction, input interpretation, and command bindings directly.
+//
+// Controls.java remains in the repository on purpose:
+// 1. It preserves the original design for students who want to study the pre-command-based robot.
+// 2. It provides a side-by-side comparison with the newer RobotContainer-centered structure.
+// 3. It documents one reasonable TimedRobot-era approach that was later absorbed by command-based wiring.
 public class Controls
 {
     public static enum BeltDirection {off,in,out}

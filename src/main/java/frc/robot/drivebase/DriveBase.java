@@ -6,11 +6,13 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
 public class DriveBase
 {
-    private class DrivePair
-    {
-        public double left;
-        public double right;
-    }
+    // Historical cleanup note:
+    // The original 2020 source used a mutable inner helper to carry left/right values through
+    // the reverse, orientation, and safety transforms. During Stage 2 on September 4, 2026,
+    // that helper was replaced with an immutable record so the code stays easier to read
+    // without changing any drive behavior.
+    private record DriveValues(double left, double right) { }
+
     private MotorController speedControllerLeft;
     private MotorController speedControllerRight;
     private Encoder encoderLeft;
@@ -46,80 +48,71 @@ public class DriveBase
     {
         reverse = !reverse;
     }
-    private DrivePair orient(DrivePair pair)
+    private DriveValues orient(DriveValues pair)
     {
-        DrivePair output = new DrivePair();
         if(rightDriveForward)
         {
-            output.left = -pair.left;
-            output.right = pair.right;
+            return new DriveValues(-pair.left(), pair.right());
         }
-        else
-        {
-            output.right = -pair.right;
-            output.left = pair.left;
-        }
-        return output;
+
+        return new DriveValues(pair.left(), -pair.right());
     }
-    private DrivePair reverse(DrivePair pair)
+
+    private DriveValues reverse(DriveValues pair)
     {
-        DrivePair output = new DrivePair();
         if(reverse)
         {
-            output.left = -pair.right;
-            output.right = -pair.left;
+            return new DriveValues(-pair.right(), -pair.left());
         }
-        else{
-            output.left = pair.left;
-            output.right = pair.right;
-        }
-        return output;
+
+        return pair;
     }
-    private DrivePair safety(DrivePair pair)
+
+    private DriveValues safety(DriveValues pair)
     {
-        DrivePair output = new DrivePair();
+        double rightOutput;
         if(rightLimitSwitch.get() == rightLimitSwitchTrippedValue)
         {
             if(rightDriveForward)
             {
-                output.right = Math.min(pair.right, 0);
+                rightOutput = Math.min(pair.right(), 0);
             }
             else
             {
-                output.right = Math.max(pair.right, 0);
+                rightOutput = Math.max(pair.right(), 0);
             }
         }
         else
         {
-            output.right = pair.right;
+            rightOutput = pair.right();
         }
 
+        double leftOutput;
         if(leftLimitSwitch.get() == leftLimitSwitchTrippedValue)
         {
             if(!rightDriveForward)
             {
-                output.left = Math.min(pair.left, 0);
+                leftOutput = Math.min(pair.left(), 0);
             }
             else
             {
-                output.left = Math.max(pair.left, 0);
+                leftOutput = Math.max(pair.left(), 0);
             }
         }
         else
         {
-            output.left = pair.left;
+            leftOutput = pair.left();
         }
-        return output;
+
+        return new DriveValues(leftOutput, rightOutput);
     }
+
     public void drive(double left, double right)
     {
-        DrivePair raw = new DrivePair();
-        raw.left = left;
-        raw.right = right;
-
-        DrivePair processed = safety(orient(reverse(raw)));
+        DriveValues raw = new DriveValues(left, right);
+        DriveValues processed = safety(orient(reverse(raw)));
     
-        speedControllerLeft.set(processed.left);
-        speedControllerRight.set(processed.right);
+        speedControllerLeft.set(processed.left());
+        speedControllerRight.set(processed.right());
     }
 }

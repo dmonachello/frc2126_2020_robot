@@ -193,6 +193,81 @@ Verification:
 3. Existing unit tests passed.
 4. No build warnings were emitted.
 
+### 2026-09-04 Controls Helper Retirement Slice
+
+Decision:
+
+1. `Controls.java` is no longer part of the active teleop path.
+2. `RobotContainer` now owns the live controller objects, deadband handling, button mapping, and reverse-drive binding.
+3. `Controls.java` remains in the repository as an archival teaching reference instead of being deleted immediately.
+
+Why it was handled this way:
+
+1. `Controls.java` explains why the 2020 robot used a polling helper instead of command bindings.
+2. Students can compare the old input-translation helper directly against the new `RobotContainer` methods.
+3. Keeping the file avoids losing the design history that explains how the project evolved.
+
+What changed:
+
+1. Added stronger archival comments to `Controls.java`.
+2. Documented that the class is kept for comparison, not for active runtime use.
+3. Preserved the file unchanged functionally so the old design remains readable for instruction.
+
+Verification:
+
+1. This slice should not change runtime behavior.
+2. A clean build is still required after the documentation update.
+
+### 2026-09-04 Command-Based Teleop Test Slice
+
+Decision:
+
+1. Keep `TeleopTest` as executable coverage for the archived 2020 polling design.
+2. Add a separate command-based test suite for the active Stage 2 teleop path.
+3. Test each teleop command at the command/subsystem seam instead of trying to integration-test `RobotContainer` hardware construction.
+
+Why it was handled this way:
+
+1. The active runtime path is now split across multiple commands, so the tests should reflect that structure.
+2. Direct command tests are easier for students to understand than heavier scheduler-and-joystick integration scaffolding.
+3. This preserves the old tests while showing how behavior coverage evolves during a migration.
+
+What changed:
+
+1. Added `TeleopCommandsTest` under `src/test/java/frc/robot/commands`.
+2. Added focused tests for drive, climber, ball manipulator, gimbal, and wheel spinner teleop commands.
+3. Kept `TeleopTest` in place as historical-reference coverage for the retired polling coordinator.
+
+Verification:
+
+1. `./gradlew build` must pass.
+2. Both the archived `TeleopTest` suite and the new command-based tests must pass.
+
+### 2026-09-04 DriveBase Helper Cleanup Slice
+
+Decision:
+
+1. Replace the mutable `DrivePair` helper inside `DriveBase` with an immutable value carrier.
+2. Keep the reverse, orientation, and safety transform order exactly the same.
+3. Treat this as a readability cleanup, not a behavior change.
+
+Why it was handled this way:
+
+1. `DrivePair` existed only to move two numbers through a few helper methods.
+2. The old mutable inner class worked, but it was harder to explain than a small immutable value object.
+3. This is a good teaching example of a safe cleanup that improves code clarity without changing robot behavior.
+
+What changed:
+
+1. Replaced `DrivePair` with an internal `DriveValues` record in `DriveBase`.
+2. Updated `reverse`, `orient`, `safety`, and `drive` to use the new immutable value carrier.
+3. Added comments explaining why the helper changed during the migration.
+
+Verification:
+
+1. `./gradlew build` must pass.
+2. Existing `DriveBaseTest` coverage must continue to pass unchanged.
+
 ## Student Notes
 
 This is the main architectural teaching stage. It should explain how the existing `TimedRobot` and `Teleop` flow maps into subsystems, default commands, and button bindings.

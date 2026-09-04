@@ -166,6 +166,33 @@ Verification:
 3. Existing unit tests passed.
 4. No build warnings were emitted.
 
+### 2026-09-04 Teleop Coordinator Retirement Slice
+
+Decision:
+
+1. `Teleop.java` is no longer part of the active runtime path.
+2. The active teleop path now runs through `RobotContainer`, subsystem default commands, and bindings.
+3. Instead of deleting `Teleop.java` immediately, it remains in the repository as an archival teaching reference.
+
+Why it was handled this way:
+
+1. Students can still read the original 2020 teleop coordinator beside the new command-based structure.
+2. The existing `TeleopTest` suite still provides an executable reference for the old polling logic.
+3. Keeping the file temporarily makes the before/after comparison easier during instruction.
+
+What changed:
+
+1. Added archival comments to `Teleop.java`.
+2. Added a matching historical note to `TeleopTest.java`.
+3. Documented that the command-based path has fully replaced `Teleop.java` at runtime.
+
+Verification:
+
+1. Ran `./gradlew build`.
+2. The project built successfully.
+3. Existing unit tests passed.
+4. No build warnings were emitted.
+
 ## Student Notes
 
 This is the main architectural teaching stage. It should explain how the existing `TimedRobot` and `Teleop` flow maps into subsystems, default commands, and button bindings.

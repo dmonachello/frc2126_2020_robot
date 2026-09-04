@@ -250,6 +250,22 @@ Key points:
 4. Identify which classes are still transitional and which are already idiomatic command-based code.
 5. Propose the next slice to continue the migration.
 
+## Slide 18: Retiring Teleop.java
+
+Title:
+Retire the Old Coordinator Without Losing the Lesson
+
+Key points:
+
+1. `Teleop.java` is no longer used by the active robot runtime.
+2. `RobotContainer`, default commands, and bindings now own teleop behavior.
+3. `Teleop.java` was kept as an archival teaching reference instead of being deleted immediately.
+4. `TeleopTest` now acts as a behavior reference for the old polling model.
+
+Teaching note:
+
+Removing a legacy design from runtime use does not mean throwing away the evidence. Sometimes the old code is most valuable as a comparison artifact.
+
 ## Next Presentation Updates
 
 Add future slides or revise these when:

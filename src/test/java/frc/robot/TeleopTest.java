@@ -15,6 +15,10 @@ import frc.robot.gimbal.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+// Historical note:
+// These tests now validate the archived 2020 teleop coordinator as a behavior reference.
+// They are useful during Stage 2 because they preserve an executable description of the old
+// polling-based teleop logic while the active robot code moves into commands and bindings.
 public class TeleopTest
 {
     private final Climber climber = Mockito.mock(Climber.class);

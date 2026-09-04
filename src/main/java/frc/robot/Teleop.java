@@ -8,6 +8,15 @@ import frc.robot.weelspinner.WeelSpinner;
 import frc.robot.gimbal.*;
 import frc.robot.pinout.PinOut;
 
+// Historical note:
+// This class was the original 2020 teleop coordinator. In the TimedRobot design it polled the
+// Controls helper every cycle and then directly pushed those decisions into the mechanism classes.
+//
+// Stage 2 retirement note on September 4, 2026:
+// Teleop.java is no longer part of the active runtime path. RobotContainer, subsystem default
+// commands, and button bindings now own teleop behavior. The class remains in the repository as
+// an archival teaching reference so students can compare the old polling model to the command-based
+// structure that replaced it.
 public class Teleop
 {
   private final Climber climber;

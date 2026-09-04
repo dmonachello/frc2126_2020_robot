@@ -10,6 +10,12 @@ This directory holds the migration and teaching notes for converting the 2020 ro
 2. [Blocker Log](./blocker-log.md)
 3. [Presentation Outline](./presentation-outline.md)
 
+## Archive References
+
+1. [Archived 2020 Teleop Reference](./archive/teleop-2020-reference.md)
+2. [Archived 2020 Controls Reference](./archive/controls-2020-reference.md)
+3. [Archived 2020 Teleop Test Reference](./archive/teleop-test-2020-reference.md)
+
 ## Stage Notes
 
 1. [Stage 0: Archival Baseline](./stages/stage-0-archival-baseline.md)

@@ -120,6 +120,7 @@ Exit Criteria:
 1. Teleop uses standard command-based structure.
 2. The project still builds cleanly with no warnings.
 3. Command ownership and subsystem boundaries are documented.
+4. Retired teleop helpers are either removed or archived outside the active source tree.
 
 ### Stage 3: Command-Based Autonomous Conversion
 

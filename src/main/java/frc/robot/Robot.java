@@ -13,13 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 
-/**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the TimedRobot
- * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the build.gradle file in the
- * project.
- */
+/** NAME: Robot - WPILib lifecycle shell for autonomous and command scheduling. */
 public class Robot extends TimedRobot {
   private static final String kDontDoAnyThingAuto = "don't do anything";
   private static final String kDriveForwardCountinouslyAuto = "drive forward continously";
@@ -34,10 +28,7 @@ public class Robot extends TimedRobot {
   private long drivingForwardStartTime;
   // Stage 2 transition: hardware wiring moved out of Robot and into RobotContainer.
   private RobotContainer robotContainer;
-  /**
-   * This function is run when the robot is first started up and should be
-   * used for any initialization code.
-   */
+  /** NAME: robotInit - creates the container and publishes autonomous choices. */
   @Override
   public void robotInit() {
     m_chooser.setDefaultOption("Drive Forawrd And Score", kDriveForwardAndScore);
@@ -49,35 +40,19 @@ public class Robot extends TimedRobot {
     robotContainer = new RobotContainer();
   }
 
-  /**
-   * This function is called every robot packet, no matter the mode. Use
-   * this for items like diagnostics that you want ran during disabled,
-   * autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before
-   * LiveWindow and SmartDashboard integrated updating.
-   */
+  /** NAME: robotPeriodic - runs the command scheduler every robot packet. */
   @Override
   public void robotPeriodic() {
     // Command-based robots run bindings and default commands through the scheduler every cycle.
     CommandScheduler.getInstance().run();
   }
 
+  /** NAME: reset - stops container-owned outputs before a mode transition. */
   private void reset() {
     robotContainer.resetRobot();
   }
 
-  /**
-   * This autonomous (along with the chooser code above) shows how to select
-   * between different autonomous modes using the dashboard. The sendable
-   * chooser code works with the Java SmartDashboard. If you prefer the
-   * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-   * getString line to get the auto name from the text box below the Gyro
-   *
-   * <p>You can add additional auto modes by adding additional comparisons to
-   * the switch structure below with additional strings. If using the
-   * SendableChooser make sure to add them to the chooser code above as well.
-   */
+  /** NAME: autonomousInit - cancels commands, selects autonomous mode, and resets outputs. */
   @Override
   public void autonomousInit() {
     // Cancel teleop/default commands before the old autonomous state machine runs.
@@ -90,14 +65,9 @@ public class Robot extends TimedRobot {
     reset();
   }
 
-  /**
-   * This function is called periodically during autonomous.
-   */
+  /** NAME: autonomousPeriodic - runs the retained 2020 autonomous state machine. */
   @Override
   public void autonomousPeriodic() {
-    robotContainer.updateAutonomousDashboard();
-
-
     switch (m_autoSelected) {
       case kDontDoAnyThingAuto:
         // Put custom auto code here
@@ -154,40 +124,35 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /**
-   * This function is called periodically during operator control.
-   */
+  /** NAME: teleopInit - lifecycle hook; bindings already run through robotPeriodic. */
   @Override
   public void teleopInit() {
-    // The compressor was started directly in teleopPeriodic() in the 2020 code.
-    // In the 2026 build we enable closed-loop compressor control once on teleop entry.
-    robotContainer.enableCompressor();
   }
 
-  /**
-   * This function is called periodically during operator control.
-   */
+  /** NAME: teleopPeriodic - lifecycle hook; commands own teleop behavior. */
   @Override
   public void teleopPeriodic() {
   }
 
-  /**
-   * This function is called periodically during test mode.
-   */
+  /** NAME: testInit - cancels active commands before test mode. */
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
-    robotContainer.enableCompressor();
   }
 
   /**
-   * This function is called periodically during test mode.
+   * NAME
+   *     testPeriodic - keeps outputs stopped during test mode.
    */
   @Override
   public void testPeriodic() {
     reset();
   }
 
+  /**
+   * NAME
+   *     disabledInit - cancels active commands when the robot disables.
+   */
   @Override
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();

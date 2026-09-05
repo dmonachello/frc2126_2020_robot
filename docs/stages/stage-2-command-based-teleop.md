@@ -439,11 +439,423 @@ Verification:
 1. `./gradlew build` must pass.
 2. The scheduler-level and input-mapping regression tests must still pass.
 
+### 2026-09-04 Constants Cleanup Slice
+
+Decision:
+
+1. Replace `PinOut.java` with a root-level `Constants.java`.
+2. Group the values by purpose instead of keeping them as mutable instance fields.
+3. Use the modern WPILib constants pattern in the active code and tests.
+
+Why it was handled this way:
+
+1. `PinOut.java` was a 2020-style global constant holder that no longer matched the structure we want students to learn.
+2. `Constants.java` is the standard WPILib convention and makes the project look more like current examples.
+3. This cleanup improves readability without changing robot behavior.
+
+What changed:
+
+1. Added `src/main/java/frc/robot/Constants.java`.
+2. Moved hardware IDs, operator mappings, and tuning values into nested constant groups.
+3. Updated `RobotContainer`, `RobotHardware`, and regression tests to use `Constants`.
+4. Removed `src/main/java/frc/robot/pinout/PinOut.java`.
+
 Verification:
 
 1. `./gradlew build` must pass.
-2. The new scheduler-level tests must pass alongside the existing command and input tests.
+2. No code or tests should reference `PinOut` after the cleanup.
+
+### 2026-09-05 Button Binding Consolidation Slice
+
+Decision:
+
+1. Put every discrete operator-action binding in `RobotContainer.configureBindings()`.
+2. Reserve `configureDefaultCommands()` for continuous controls only: the drive-stick axes.
+3. Give the independently powered belt and roller separate subsystem ownership so their controls can run simultaneously.
+
+Why it was handled this way:
+
+1. A student should be able to open one method and find every event-style control: press, hold, and release behavior.
+2. The climber is an event-style control: hold the button for up, then command down when released.
+3. The 2020 `BallManipulator` class controls two independent motors. Modeling it as one subsystem would make WPILib interrupt one command when the other starts, even though the robot can physically run both at once.
+4. `BeltSubsystem` and `RollerSubsystem` give those motors separate scheduler ownership. The obsolete combined `BallManipulator` wrapper was retired to `docs/archive/retired-ball-manipulator.md` because it no longer represents the active architecture.
+5. The drive slow button remains part of drive-axis value interpretation. It is a scale modifier, not a separate scheduled mechanism action.
+
+What changed:
+
+1. Moved climber hold/release behavior from `ClimberTeleopCommand` into a `Trigger` binding.
+2. Added separate bindings for belt-in, belt-out, and roller controls, keeping all original button numbers and the original belt-in priority when both belt buttons are held.
+3. Replaced `BallManipulatorSubsystem` with `BeltSubsystem` and `RollerSubsystem` so their commands can run concurrently.
+4. Removed the retired climber and ball-manipulator default command classes.
+5. Updated scheduler regression coverage to verify active bindings and release behavior through `RobotContainer`.
+
+Verification:
+
+1. `./gradlew build` must pass.
+2. Scheduler tests must verify that climber and ball-manipulator bindings run and stop correctly.
+
+### 2026-09-05 Explicit Command Objects Slice
+
+Decision:
+
+1. Teach the command lifecycle with named command classes instead of inline command helpers.
+2. Keep `RobotContainer.configureBindings()` as a short mapping from each button to a command object.
+3. Make both slow-drive buttons explicit bindings while preserving independent left and right scaling.
+
+Why it was handled this way:
+
+1. Inline `InstantCommand` and `RunCommand` helpers are concise, but they hide the `initialize`, `execute`, `end`, and `isFinished` lifecycle that new students need to learn.
+2. A student can now open `BeltInCommand`, `ToggleClimberArmsCommand`, or `SlowDriveCommand` and see the complete behavior of one action.
+3. The initial command-based version allowed either drive side to be slowed independently. The current student control map replaces that with one shared slow-drive button.
+
+What changed:
+
+1. Replaced inline command helpers with named `Command` subclasses for driving, reversing, climbing, belt-in, belt-out, roller, and slow drive.
+2. Changed bindings to use the plain `JoystickButton` form where one physical button maps directly to one command.
+3. Kept `Trigger` only where the original behavior needs a combined condition: either reverse button, either roller button, or belt-out only when belt-in is not held.
+4. Added scheduler coverage for normal drive, left slow drive, and both slow buttons together.
+
+2026 library note:
+
+1. Current WPILib uses `Command` as the base class for explicit commands. The older `CommandBase` teaching pattern is not present in the 2026.2.1 library, but the lifecycle methods are the same.
+
+Verification:
+
+1. `./gradlew build` must pass.
+2. The scheduler tests must prove that independent mechanism and slow-drive bindings can run concurrently.
+
+### 2026-09-05 Reverse-Drive Deferral Slice
+
+Decision:
+
+1. Remove reverse-drive orientation from the active student control map.
+2. Keep it as an optional future exercise rather than a required teleop feature.
+
+Why it was handled this way:
+
+1. Reverse drive is a persistent orientation toggle, not a momentary backward-drive action; that distinction adds unnecessary control complexity for the initial student robot.
+2. The two driver joysticks should focus on straightforward driving controls.
+3. Students can later decide whether the feature is useful after testing the real robot and then implement it as a contained command-based exercise.
+
+What changed:
+
+1. Removed the active reverse button binding, its command class, its operator constant, and its RobotContainer regression tests.
+2. Left the low-level drivetrain reverse capability unchanged, so the later exercise has a known starting point.
+3. Preserved the historical archive references because they describe what the 2020 robot actually did.
+
+TBD student exercise:
+
+1. Define the intended driver use case for reverse orientation.
+2. Choose one unambiguous button on the driver controller.
+3. Implement a named command, add a binding, add scheduler regression coverage, and validate it on the physical robot.
+
+### 2026-09-05 Controller Responsibility Simplification Slice
+
+Decision:
+
+1. Reserve driver joystick ports `0` and `1` for drivetrain controls only.
+2. Move roller control from duplicate driver joystick buttons to operator controller port `2`, button `1`.
+3. Keep climber and belt controls on the operator controller, giving every active non-driving mechanism action one binding.
+
+Why it was handled this way:
+
+1. New students can identify responsibility immediately: driver controls driving, operator controls mechanisms.
+2. Duplicate roller bindings made it harder to explain which operator owns the action.
+3. The separate `isRollerRequested()` condition is no longer needed after the reassignment.
+4. Belt-out retains an explicit guard because in and out are contradictory commands for one belt motor; belt-in remains the documented priority if both are held.
+
+Active control map:
+
+| Controller port | Active controls |
+| --- | --- |
+| `0`: left driver joystick | Left drive axis; shared slow-drive button `2` |
+| `1`: right driver joystick | Right drive axis |
+| `2`: operator controller | Roller `1`; climber `5`; belt in `6`; belt out `8` |
+
+Verification:
+
+1. Scheduler regression tests must prove that operator roller, belt, and climber actions work together.
+2. `./gradlew build` must pass with no warnings.
+
+### 2026-09-05 Direct Belt Direction Bindings Slice
+
+Decision:
+
+1. Use direct, symmetric button bindings for both belt-in and belt-out.
+2. Do not add code that chooses a direction when both belt buttons are held.
+
+Why it was handled this way:
+
+1. The controls are easier for new students to read when each belt direction follows the same pattern: one button starts one named command.
+2. Holding contradictory direction buttons is operator error, not behavior that this introductory control map needs to resolve.
+
+What changed:
+
+1. Replaced the guarded belt-out `Trigger` with a direct `JoystickButton` binding.
+2. Removed `isBeltOutRequested()` from `RobotContainer`.
+3. Removed the previously documented belt-in priority from the active control behavior.
+
+Operator responsibility:
+
+1. Hold either belt-in or belt-out, not both at once.
+2. If both are held, WPILib command scheduling determines which competing belt command remains active; that condition is intentionally unsupported.
+
+### 2026-09-05 Runtime/Test Separation Follow-Up
+
+Decision:
+
+1. Remove input-helper methods that existed only for direct unit tests and are not part of the live control design.
+2. Test active controls through `RobotContainerSchedulerTest`, which uses the command scheduler and fake hardware entirely from `src/test/java`.
+
+Why it was handled this way:
+
+1. Students should see only active control code in `RobotContainer`.
+2. A scheduler-level regression test exercises the real buttons, bindings, commands, and subsystems without exposing test-only methods in production code.
+
+What changed:
+
+1. Removed the retired `RobotContainerInputTest` and its production input-test seam.
+2. Made the two drive-axis suppliers private implementation details again.
+3. Kept the focused command test and scheduler-level control-map tests in the test source tree.
+
+### 2026-09-05 Shared Slow-Drive Control Slice
+
+Decision:
+
+1. Use one slow-drive button on left driver joystick port `0`, button `2`.
+2. Slow both drivetrain sides together while that button is held.
+
+Why it was handled this way:
+
+1. A driver normally wants precision movement from the whole robot, not independent left/right speed scaling.
+2. One button, one state, and one named command are easier for new students to understand and test.
+
+What changed:
+
+1. Replaced `SlowLeftDriveCommand` and `SlowRightDriveCommand` with `SlowDriveCommand`.
+2. Simplified `DriveSpeedMode` to one shared state.
+3. Updated scheduler coverage to verify normal speed, both-side slow speed, and release back to normal speed.
 
 ## Student Notes
+
+### 2026-09-05 Student-First Hardware Construction Slice
+
+Decision:
+
+1. Remove the `RobotHardware` dependency-injection bundle from active production code.
+2. Let `RobotContainer` directly create controllers and subsystems.
+3. Let each subsystem construct and own its real hardware.
+4. Defer a full scheduler-and-hardware simulation test environment as a TBD advanced exercise.
+
+Why it was handled this way:
+
+1. The standard beginner command-based structure is easier to follow when `RobotContainer` visibly creates the controllers and subsystems it wires together.
+2. The previous `RobotHardware` class and alternate `RobotContainer` constructor existed only to support an integration-test harness, not robot behavior.
+3. Focused tests can validate named command behavior using mocked subsystems entirely under `src/test/java` without putting fake-hardware paths into production classes.
+
+What changed:
+
+1. Removed `RobotHardware` and the `RobotContainer` fake-hardware constructor.
+2. Moved concrete motor, sensor, and pneumatic construction into the corresponding subsystem constructors.
+3. Removed `RobotContainerSchedulerTest` and replaced its coverage with focused named-command tests.
+4. Kept the old mechanism-level regression tests; a full command scheduler simulation is now explicitly deferred.
+
+TBD advanced test exercise:
+
+1. Build a hardware simulation fixture outside the active production path.
+2. Run `RobotContainer` through the WPILib scheduler using simulated driver-station inputs.
+3. Compare that integration coverage with the smaller focused command tests.
+
+### 2026-09-05 Ultrasonic Sensor Deferral Slice
+
+Decision:
+
+1. Remove ultrasonic distance sensing from the active runtime path.
+2. Keep distance sensing as a TBD student extension instead of publishing unused dashboard data.
+
+Why it was handled this way:
+
+1. The code only displayed ultrasonic voltage and calculated distance; no teleop or autonomous behavior used the measurement.
+2. Unused sensors add wiring, code, and teaching surface without a current robot decision to support.
+
+What changed:
+
+1. Removed the active ultrasonic class, constants, `RobotContainer` field, and autonomous dashboard update call.
+2. Preserved the decision in the Markdown teaching material.
+
+TBD student exercise:
+
+1. Verify whether an ultrasonic sensor is installed and reliable on the physical robot.
+2. Define a specific distance-driven behavior before adding it back.
+3. Test the sensor conversion and the resulting robot behavior.
+
+### 2026-09-05 Compressor Control Deferral Slice
+
+Decision:
+
+1. Remove explicit `Compressor` construction and `enableDigital()` calls from the active robot code.
+2. Rely on the CTRE PCM's default digital closed-loop pressure control for the climber pneumatics.
+3. Treat compressor telemetry and manual compressor control as a TBD advanced exercise.
+
+Why it was handled this way:
+
+1. The active robot uses double solenoids for the climber, and the PCM controls compressor pressure independently.
+2. Creating a compressor object only to enable its default behavior adds code without changing the intended operation.
+
+What changed:
+
+1. Removed the `Compressor` field and `enableCompressor()` method from `RobotContainer`.
+2. Removed compressor-enable calls from `teleopInit()` and `testInit()`.
+3. Kept the PCM constant because the climber solenoids still require it.
+
+TBD advanced pneumatics exercise:
+
+1. Add compressor current, pressure-switch, and enabled-state telemetry.
+2. Decide whether a real driver or safety use case requires manual compressor control.
+
+### 2026-09-05 Direct Ball-Motor Direction Slice
+
+Decision:
+
+1. Remove the belt and roller software-direction flags.
+2. Make positive and negative command values flow directly to the corresponding motor.
+
+Why it was handled this way:
+
+1. Both flags were set to `true`, so they had no active effect.
+2. The extra inversion layer obscured the simple teaching rule: positive belt speed is in, negative belt speed is out.
+3. If motor direction is physically wrong, correct wiring or the mechanism configuration instead of adding a hidden runtime sign switch.
+
+### 2026-09-05 DriveSubsystem Consolidation Slice
+
+Decision:
+
+1. Remove the legacy `DriveBase` class from the active runtime.
+2. Put the installed robot's drivetrain behavior directly in `DriveSubsystem`.
+3. Remove the deferred reverse-drive implementation, not just its button binding.
+
+Why it was handled this way:
+
+1. `DriveSubsystem` already owns the drive motors and limit switches, so a separate forwarding class did not help beginners follow the code.
+2. The old `DriveBase` accepted unused encoders and a configurable drive orientation even though this robot uses one installed orientation.
+3. The active control map intentionally has no reverse-drive feature. Leaving its implementation in runtime code would make the student project harder to read.
+
+What changed:
+
+1. `DriveSubsystem.drive(leftSpeed, rightSpeed)` now reads both limit switches, blocks positive speed into an active switch, and commands the two motor pairs.
+2. The right motor pair is explicitly inverted once during construction to match the physical drivetrain orientation.
+3. Replaced the old generic `DriveBaseTest` suite with focused `DriveSubsystemTest` coverage for the installed forward-limit safety rule.
+4. The optional reverse-drive idea remains a documented TBD exercise; it is not compiled runtime behavior.
+
+Student reading path:
+
+```text
+DriveTeleopCommand -> DriveSubsystem.drive -> limit-switch safety -> motor pairs
+```
+
+### 2026-09-05 Drivetrain Limit-Switch Deferral Slice
+
+Decision:
+
+1. Remove the left and right drivetrain limit switches from the active runtime.
+2. Treat drivetrain position sensing and travel protection as a TBD safety exercise.
+
+Why it was handled this way:
+
+1. The class needs a clear first command-based drivetrain example: two requested tank-drive speeds go directly to two motor pairs.
+2. The team has not yet confirmed that these switches are installed, correctly wired, and needed on the physical robot.
+3. Untested safety code can create a false impression that the robot is protected.
+
+What changed:
+
+1. Removed drivetrain `DigitalInput` construction and DIO constants.
+2. Removed the forward-motion guard and its focused tests because the feature is no longer active behavior.
+3. `DriveSubsystem.drive(leftSpeed, rightSpeed)` now directly commands the left and right motor pairs.
+
+TBD safety exercise:
+
+1. Inspect the physical drivetrain for left and right limit switches and document their purpose.
+2. Verify wiring, active values, and which motion each switch must block.
+3. Add the safety rule back only with a specific physical requirement and regression tests.
+
+### 2026-09-05 Climber Subsystem Consolidation Slice
+
+Decision:
+
+1. Keep all active climber hardware code in `ClimberSubsystem`.
+2. Remove the legacy `climber/Climber.java` and `climber/Piston.java` wrappers.
+
+Why it was handled this way:
+
+1. The active robot has one climber mechanism with two solenoids; separate wrapper classes made the control path longer without adding a student-facing concept.
+2. The command-based ownership model is clearer when `ToggleClimberArmsCommand` requires `ClimberSubsystem`, and that subsystem visibly owns and controls both solenoids.
+
+What changed:
+
+1. `ClimberSubsystem` now creates named left and right `DoubleSolenoid` objects directly.
+2. `up()` sets both configured out values; `down()` sets both configured in values.
+3. Removed the legacy wrapper tests. The focused `ToggleClimberArmsCommand` test remains as the active command behavior regression test.
+
+Student reading path:
+
+```text
+ToggleClimberArmsCommand -> ClimberSubsystem.toggleArms() -> left and right solenoids
+```
+
+### 2026-09-05 Climber Arm-Motion Naming Slice
+
+Decision:
+
+1. Name climber code for the physical arm action that is always true.
+2. Retain the existing button behavior: hold to extend the arms; release to retract them.
+
+Why it was handled this way:
+
+1. Retracting the arms raises the robot only when they are hooked on the bar; otherwise it simply brings the arms back in.
+2. Robot-level names such as `lowerRobot()` and `raiseRobot()` would therefore be misleading in some valid operating situations.
+
+What changed:
+
+1. Renamed the climber command to `ExtendClimberArmsCommand`.
+2. Renamed the subsystem methods to `extendArms()` and `retractArms()`.
+3. Updated the focused command regression test to state the actual robot behavior.
+
+Student reading path:
+
+```text
+The next slice replaces this hold/release prototype with the final press-to-toggle binding.
+```
+
+### 2026-09-05 One-Button Climber Toggle Slice
+
+Decision:
+
+1. Use one climber button as a press-to-toggle control.
+2. Do not command pneumatic motion when that button is released.
+
+Why it was handled this way:
+
+1. The operator needs one button to extend arms to hook the bar, retract them to raise the robot, and extend them again to lower the robot.
+2. Releasing a button must not unexpectedly spend air or move the arms.
+
+What changed:
+
+1. Replaced `ExtendClimberArmsCommand` with `ToggleClimberArmsCommand`.
+2. Changed the button binding from `whileTrue(...)` to `onTrue(...)`, which schedules the command only when the button is pressed.
+3. `ClimberSubsystem.toggleArms()` alternates between `extendArms()` and `retractArms()`.
+
+Physical-starting-position requirement:
+
+1. The software begins by assuming the arms are retracted.
+2. Before enabling the robot, verify that the arms are physically retracted; otherwise the first press will select the wrong next action.
+
+Student operating sequence:
+
+```text
+First press:  extend arms and hook the bar
+Second press: retract arms and raise the robot
+Third press:  extend arms and lower the robot
+Button release: no pneumatic action
+```
 
 This is the main architectural teaching stage. It should explain how the existing `TimedRobot` and `Teleop` flow maps into subsystems, default commands, and button bindings.

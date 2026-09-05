@@ -10,18 +10,23 @@ package frc.robot;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
- * Do NOT add any static variables to this class, or any initialization at all.
- * Unless you know what you are doing, do not modify this file except to
- * change the parameter class to the startRobot call.
+ * NAME
+ *     Main - starts the WPILib robot application.
+ *
+ * DESCRIPTION
+ *     This class intentionally contains no robot hardware or control initialization.
  */
 public final class Main {
+  /** NAME: Main - prevents construction of the application entry-point class. */
   private Main() {
   }
 
   /**
-   * Main initialization function. Do not perform any initialization here.
+   * NAME
+   *     main - gives WPILib the class that implements the robot lifecycle.
    *
-   * <p>If you change your main robot class, change the parameter type.
+   * PARAMETERS
+   *     args - command-line arguments supplied by the Java runtime; not used by the robot.
    */
   public static void main(String... args) {
     RobotBase.startRobot(Robot::new);

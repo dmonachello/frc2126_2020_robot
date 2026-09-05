@@ -104,6 +104,7 @@ Requirements:
 2. Preserve the working behavior established in Stage 1 as closely as possible.
 3. Move hardware ownership and control responsibilities into standard command-based roles.
 4. Make the structure teachable to students who are learning modern WPILib patterns.
+5. Use ports `0` and `1` only for drivetrain controls; assign climber and ball-handling controls to operator controller port `2` without duplicate command bindings.
 
 Directory and Package Transition Rule:
 
@@ -222,6 +223,9 @@ These questions do not block the spec, but they should be resolved as the work b
 2. Exact Markdown document layout under `docs/`
 3. Exact branch naming convention
 4. Exact definition of the clean-build command set used to validate each stage
+5. Optional reverse-drive orientation toggle: defer it from the active student control map until students choose to implement and test it.
+6. Keep drivetrain processing in `DriveSubsystem` unless a future feature creates a clearly justified separate responsibility.
+7. Confirm every safety sensor is physically installed, wired, and tested before making it active robot behavior.
 
 ## Immediate Next Step
 

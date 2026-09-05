@@ -309,3 +309,110 @@ Add future slides or revise these when:
 1. Stage 1 receives hardware-validation notes.
 2. Stage 2 removes more of the old teleop structure.
 3. Stage 3 begins autonomous command conversion.
+
+## Slide 22: Optional Reverse-Drive Exercise
+
+Title:
+An Optional Feature, Not a Required Control
+
+Key points:
+
+1. The 2020 robot had a persistent reverse-drive orientation toggle.
+2. The active 2026 student control map intentionally leaves that feature out.
+3. Students may later design, implement, test, and field-validate an optional reverse-drive command.
+4. This is a useful exercise in deciding whether a feature helps drivers enough to justify added control complexity.
+
+## Slide 23: Simplified Three-Controller Map
+
+Title:
+One Controller, One Responsibility
+
+Key points:
+
+1. Driver joystick port `0`: left drive axis and the shared slow-drive button.
+2. Driver joystick port `1`: right drive axis.
+3. Operator controller port `2`: roller button `1`, climber button `5`, belt-in button `6`, and belt-out button `8`.
+4. Each active robot action has one operator binding; driver joysticks do not operate ball-handling or climbing mechanisms.
+
+## Slide 24: Keep Production Code Readable
+
+Title:
+Real Hardware First, Advanced Test Harness Later
+
+Key points:
+
+1. `RobotContainer` directly creates controllers and subsystems, as in the standard beginner command-based layout.
+2. Each subsystem creates and owns its real hardware.
+3. Focused tests use mocks only under `src/test/java`; production code has no fake-hardware constructor.
+4. A full scheduler and hardware simulation environment is a TBD advanced testing exercise.
+
+## Slide 25: Optional Distance Sensing Exercise
+
+Title:
+Keep Sensors Only When They Support a Decision
+
+Key points:
+
+1. The 2020 code published ultrasonic distance data but did not use it to control the robot.
+2. The active student robot leaves that unused sensor path out.
+3. Students may later validate the sensor, define a real use case, and add an autonomous or driver-assist feature with regression coverage.
+
+## Slide 26: Pneumatics Without Extra Control Code
+
+Title:
+Use the PCM's Built-In Pressure Control
+
+Key points:
+
+1. The climber's solenoids remain active through the CTRE PCM.
+2. Closed-loop compressor control is enabled by default on the PCM.
+3. The active robot does not create a `Compressor` object only to enable a default behavior.
+4. Compressor telemetry or manual control is a TBD advanced pneumatics exercise.
+
+## Slide 27: One Drivetrain Class
+
+Title:
+DriveSubsystem Owns the Drivetrain
+
+Key points:
+
+1. `DriveSubsystem` owns the two drive motor pairs.
+2. It sends left and right tank-drive speeds directly to those motor pairs.
+3. The right motor pair is inverted once because it is physically mounted opposite the left pair.
+4. Removing the old `DriveBase` layer makes the teleop path easier to trace.
+
+## Slide 28: Validate Safety Hardware Before Using It
+
+Title:
+Safety Features Need Physical Evidence
+
+Key points:
+
+1. The 2020 code contained left and right drivetrain limit-switch logic.
+2. The team has not confirmed that those switches belong on the current robot and work correctly.
+3. The active student runtime does not claim to provide this unverified protection.
+4. Students may add it as a documented, tested safety exercise after inspecting the hardware.
+
+## Slide 29: One Class Per Active Mechanism
+
+Title:
+The Climber Is One Subsystem
+
+Key points:
+
+1. `ClimberSubsystem` owns both climber solenoids directly.
+2. `up()` extends both solenoids; `down()` retracts both solenoids.
+3. `ToggleClimberArmsCommand` changes arm position once per button press; releasing the button does nothing.
+4. Removed legacy wrapper classes so students can follow one short path from button to mechanism.
+
+## Slide 30: One-Button Climber Control
+
+Title:
+Press Changes Position, Release Does Nothing
+
+Key points:
+
+1. First press extends the arms to hook the bar.
+2. Second press retracts the arms to raise the robot.
+3. Third press extends the arms to lower the robot again.
+4. The system assumes retracted arms at startup, so students must verify the physical starting position.

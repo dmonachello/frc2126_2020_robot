@@ -31,3 +31,13 @@ Use the stage files to record:
 2. Why it changed
 3. What students should learn
 4. Any blockers, tradeoffs, or follow-up work
+
+## Current TBD
+
+Reverse-drive orientation is intentionally not part of the active student control map. It remains a later optional command-based exercise and is documented in the Stage 2 notes.
+
+The full hardware/scheduler simulation test environment is also deferred. The active test suite uses focused command and mechanism tests; a realistic integration test environment is a later teaching exercise.
+
+Ultrasonic distance sensing is not part of the active robot path. Students may later decide whether a verified distance sensor supports a useful autonomous or driver-assist feature.
+
+Explicit compressor control and compressor telemetry are deferred. The CTRE PCM's default closed-loop pressure control remains active for the climber pneumatics.

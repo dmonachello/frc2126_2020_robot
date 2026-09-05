@@ -1,69 +1,88 @@
 package frc.robot.commands;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import frc.robot.ballmanipulator.BallManipulator;
-import frc.robot.climber.Climber;
-import frc.robot.drivebase.DriveBase;
-import frc.robot.subsystems.BallManipulatorSubsystem;
+import frc.robot.Constants;
+import frc.robot.DriveSpeedMode;
+import frc.robot.subsystems.BeltSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.RollerSubsystem;
 
-// Stage 2 migration note:
-// These tests validate the active command-based teleop path. They sit beside TeleopTest so
-// students can compare how behavior coverage moved from one polling coordinator test suite
-// into smaller tests focused on individual commands.
+// Focused command tests keep test doubles out of the robot's production construction path.
 public class TeleopCommandsTest {
     @Test
-    public void driveTeleopCommandUsesSuppliedDriveValues() {
-        DriveBase driveBase = Mockito.mock(DriveBase.class);
-        DriveSubsystem driveSubsystem = new DriveSubsystem(driveBase);
-        DriveTeleopCommand command = new DriveTeleopCommand(driveSubsystem, () -> 0.75, () -> -0.25);
+    public void driveTeleopCommandUsesNormalDriveScale() {
+        DriveSubsystem driveSubsystem = Mockito.mock(DriveSubsystem.class);
+        DriveSpeedMode driveSpeedMode = new DriveSpeedMode();
+        DriveTeleopCommand command =
+            new DriveTeleopCommand(driveSubsystem, () -> 1.0, () -> -1.0, driveSpeedMode);
 
         command.execute();
 
-        Mockito.verify(driveBase).drive(0.75, -0.25);
+        Mockito.verify(driveSubsystem).drive(0.8, -0.8);
     }
 
     @Test
-    public void climberTeleopCommandDrivesClimberUpWhenRequested() {
-        Climber climber = Mockito.mock(Climber.class);
-        ClimberSubsystem climberSubsystem = new ClimberSubsystem(climber);
-        ClimberTeleopCommand command = new ClimberTeleopCommand(climberSubsystem, () -> true);
+    public void toggleClimberArmsCommandTogglesArmsOnce() {
+        ClimberSubsystem climberSubsystem = Mockito.mock(ClimberSubsystem.class);
+        ToggleClimberArmsCommand command = new ToggleClimberArmsCommand(climberSubsystem);
 
-        command.execute();
+        command.initialize();
 
-        Mockito.verify(climber).up();
-        Mockito.verify(climber, Mockito.never()).down();
+        Mockito.verify(climberSubsystem).toggleArms();
+        assertTrue(command.isFinished());
     }
 
     @Test
-    public void climberTeleopCommandDrivesClimberDownWhenNotRequested() {
-        Climber climber = Mockito.mock(Climber.class);
-        ClimberSubsystem climberSubsystem = new ClimberSubsystem(climber);
-        ClimberTeleopCommand command = new ClimberTeleopCommand(climberSubsystem, () -> false);
+    public void beltInCommandRunsForwardAndStops() {
+        BeltSubsystem beltSubsystem = Mockito.mock(BeltSubsystem.class);
+        BeltInCommand command = new BeltInCommand(beltSubsystem);
 
         command.execute();
+        command.end(false);
 
-        Mockito.verify(climber).down();
-        Mockito.verify(climber, Mockito.never()).up();
+        Mockito.verify(beltSubsystem).run(Constants.Tuning.BELT_SPEED);
+        Mockito.verify(beltSubsystem).stop();
     }
 
     @Test
-    public void ballManipulatorTeleopCommandUsesBothSuppliedSpeeds() {
-        BallManipulator ballManipulator = Mockito.mock(BallManipulator.class);
-        BallManipulatorSubsystem ballManipulatorSubsystem = new BallManipulatorSubsystem(ballManipulator);
-        BallManipulatorTeleopCommand command =
-            new BallManipulatorTeleopCommand(ballManipulatorSubsystem, () -> 1.0, () -> 0.5);
+    public void beltOutCommandRunsBackwardAndStops() {
+        BeltSubsystem beltSubsystem = Mockito.mock(BeltSubsystem.class);
+        BeltOutCommand command = new BeltOutCommand(beltSubsystem);
 
         command.execute();
+        command.end(false);
 
-        Mockito.verify(ballManipulator).outtake(0.5);
-        Mockito.verify(ballManipulator).intake(1.0);
+        Mockito.verify(beltSubsystem).run(-Constants.Tuning.BELT_SPEED);
+        Mockito.verify(beltSubsystem).stop();
     }
 
+    @Test
+    public void rollerCommandRunsAndStops() {
+        RollerSubsystem rollerSubsystem = Mockito.mock(RollerSubsystem.class);
+        RollerCommand command = new RollerCommand(rollerSubsystem);
+
+        command.execute();
+        command.end(false);
+
+        Mockito.verify(rollerSubsystem).run(Constants.Tuning.ROLLER_SPEED);
+        Mockito.verify(rollerSubsystem).stop();
+    }
+
+    @Test
+    public void slowDriveCommandSetsAndClearsSlowMode() {
+        DriveSpeedMode driveSpeedMode = new DriveSpeedMode();
+        SlowDriveCommand command = new SlowDriveCommand(driveSpeedMode);
+
+        command.initialize();
+        assertTrue(driveSpeedMode.isSlow());
+        command.end(false);
+
+        assertFalse(driveSpeedMode.isSlow());
+    }
 }

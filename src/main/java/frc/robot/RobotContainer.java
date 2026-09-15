@@ -80,10 +80,14 @@ public class RobotContainer {
 
         // The belt and roller have independent motors, so each gets a separate subsystem and
         // binding. This allows all mechanism controls to run simultaneously.
+        // whileTrue starts a mechanism command when its button is pressed and cancels it when the
+        // button is released. Each belt or roller command stops its motor from end() afterward.
         new JoystickButton(gamepad, Constants.Operator.BELT_IN_BUTTON)
             .whileTrue(new BeltInCommand(beltSubsystem));
         new JoystickButton(gamepad, Constants.Operator.BELT_OUT_BUTTON)
             .whileTrue(new BeltOutCommand(beltSubsystem));
+        // The roller uses the same whileTrue lifecycle: releasing its button cancels
+        // RollerCommand, which stops the roller motor from its end() method.
         new JoystickButton(gamepad, Constants.Operator.ROLLER_BUTTON)
             .whileTrue(new RollerCommand(rollerSubsystem));
 

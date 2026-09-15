@@ -9,7 +9,8 @@ import frc.robot.subsystems.BeltSubsystem;
  *     BeltOutCommand - runs the ball-transport belt away from the intake while held.
  *
  * DESCRIPTION
- *     Requires the belt subsystem and stops its motor when the command ends.
+ *     Requires the belt subsystem. RobotContainer schedules it with whileTrue, so releasing the
+ *     belt-out button cancels this command and invokes end() to stop the motor.
  */
 public class BeltOutCommand extends Command {
     private final BeltSubsystem beltSubsystem;
@@ -37,7 +38,7 @@ public class BeltOutCommand extends Command {
 
     /**
      * NAME
-     *     end - stops the belt motor.
+     *     end - stops the belt motor after button release or command interruption.
      *
      * PARAMETERS
      *     interrupted - true when another command interrupts this command.

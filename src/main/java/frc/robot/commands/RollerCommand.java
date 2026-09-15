@@ -9,7 +9,8 @@ import frc.robot.subsystems.RollerSubsystem;
  *     RollerCommand - runs the ball-ejection roller while held.
  *
  * DESCRIPTION
- *     Requires the roller subsystem and stops its motor when the command ends.
+ *     Requires the roller subsystem. RobotContainer schedules it with whileTrue, so releasing
+ *     the roller button cancels this command and invokes end() to stop the motor.
  */
 public class RollerCommand extends Command {
     private final RollerSubsystem rollerSubsystem;
@@ -37,7 +38,7 @@ public class RollerCommand extends Command {
 
     /**
      * NAME
-     *     end - stops the roller motor.
+     *     end - stops the roller motor after button release or command interruption.
      *
      * PARAMETERS
      *     interrupted - true when another command interrupts this command.

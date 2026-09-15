@@ -9,7 +9,8 @@ import frc.robot.subsystems.BeltSubsystem;
  *     BeltInCommand - runs the ball-transport belt toward the intake while held.
  *
  * DESCRIPTION
- *     Requires the belt subsystem and stops its motor when the command ends.
+ *     Requires the belt subsystem. RobotContainer schedules it with whileTrue, so releasing the
+ *     belt-in button cancels this command and invokes end() to stop the motor.
  */
 public class BeltInCommand extends Command {
     private final BeltSubsystem beltSubsystem;
@@ -36,7 +37,7 @@ public class BeltInCommand extends Command {
 
     /**
      * NAME
-     *     end - stops the belt motor.
+     *     end - stops the belt motor after button release or command interruption.
      *
      * PARAMETERS
      *     interrupted - true when another command interrupts this command.

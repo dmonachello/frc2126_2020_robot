@@ -157,5 +157,10 @@ gradle-app.setting
 bin/
 imgui.ini
 
+# Generated presentation and document review files
+/tmp/
+/output/**/*.inspect.ndjson
+/output/presentations/2020-robot-command-based-migration.pptx
+
 
 # End of https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode

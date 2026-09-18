@@ -50,10 +50,10 @@ public final class Constants {
 
         public static final int LEFT_DRIVE_AXIS = 1;
         public static final int RIGHT_DRIVE_AXIS = 1;
-        public static final int CLIMBER_BUTTON = 5;
-        public static final int BELT_IN_BUTTON = 6;
-        public static final int BELT_OUT_BUTTON = 8;
-        public static final int ROLLER_BUTTON = 1;
+        public static final int ROLLER_BUTTON = 2;
+        public static final int CLIMBER_BUTTON = 3;
+        public static final int BELT_IN_BUTTON = 4;
+        public static final int BELT_OUT_BUTTON = 5;
         public static final int DRIVE_SLOW_BUTTON = 2;
 
         /** NAME: Operator - prevents construction of a constants-only group. */

@@ -42,19 +42,10 @@ public final class Constants {
         }
     }
 
-    /** NAME: Operator - controller ports, axes, and button mappings. */
+    /** NAME: Operator - controller USB ports. */
     public static final class Operator {
-        public static final int LEFT_JOYSTICK = 0;
-        public static final int RIGHT_JOYSTICK = 1;
-        public static final int GAMEPAD = 2;
-
-        public static final int LEFT_DRIVE_AXIS = 1;
-        public static final int RIGHT_DRIVE_AXIS = 1;
-        public static final int ROLLER_BUTTON = 2;
-        public static final int CLIMBER_BUTTON = 3;
-        public static final int BELT_IN_BUTTON = 4;
-        public static final int BELT_OUT_BUTTON = 5;
-        public static final int DRIVE_SLOW_BUTTON = 2;
+        public static final int DRIVER_CONTROLLER = 0;
+        public static final int OPERATOR_CONTROLLER = 1;
 
         /** NAME: Operator - prevents construction of a constants-only group. */
         private Operator() {
@@ -67,6 +58,7 @@ public final class Constants {
         public static final double BELT_SPEED = 1.0;
         public static final double NORMAL_DRIVE_SCALE = 0.8;
         public static final double SLOW_DRIVE_SCALE = 0.4;
+        public static final double DRIVE_DEADBAND = 0.08;
 
         /** NAME: Tuning - prevents construction of a constants-only group. */
         private Tuning() {

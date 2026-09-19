@@ -4,6 +4,8 @@ Date: 2026-09-04
 
 This Markdown file is the running source for the future presentation deck.
 
+The final-implementation deck follows the locked four-pass structure in [final-implementation-presentation-architecture.md](final-implementation-presentation-architecture.md). Preserve that structure in every revision unless the user explicitly changes it.
+
 ## Slide 1: Project Goal
 
 Title:

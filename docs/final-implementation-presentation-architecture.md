@@ -1,71 +1,91 @@
 # Final implementation presentation architecture
 
-This file defines the required structure for the 2020 robot final-implementation presentation. Future revisions must preserve this structure unless the user explicitly changes it.
+This file defines the required structure for the 2020 robot final-implementation presentation. Future revisions must preserve these four questions unless the user explicitly changes them.
 
-## Four-pass structure
+## Four-question structure
 
-Each pass covers the complete robot at a greater level of detail. Do not flatten the presentation into independent topic sections.
+The presentation explains the finished robot by answering four questions in order.
 
-### Pass 1: Physical robot
+### 1. What does the robot do?
 
-Introduce what the finished robot contains and what the operators can control.
+Begin with the robot's physical jobs and the way the two operators control them.
 
-- Major mechanisms and actuators
-- roboRIO PWM connections
-- roboRIO-to-PCM CAN connection
-- Driver and operator Xbox controllers
-- High-level input-to-action view
+- Drive and steer with tank drive
+- Move game pieces forward or backward with the ball belt
+- Score game pieces with the roller
+- Raise or lower the climber arms
+- Separate driver and operator Xbox controller responsibilities
 
-### Pass 2: Software structure
+### 2. What are the major subsystems?
 
-Map the physical robot to the command-based classes.
+Divide the robot by physical mechanism and use WPILib's term `subsystem`.
 
-- `RobotContainer`
-- Subsystems and their hardware objects
-- Commands as scheduled robot actions
-- Controller `Trigger` bindings
-- Default commands
+- `DriveSubsystem`
+- `BeltSubsystem`
+- `RollerSubsystem`
+- `ClimberSubsystem`
 
-Tie this pass to the rule established in the deck: subsystems define how mechanisms operate, and commands define when actions occur.
+Each subsystem owns the hardware objects and methods for one mechanism.
 
-### Pass 3: Runtime behavior
+### 3. How does the hardware work?
 
-Explain how WPILib runs the software after construction.
+Explain how commands from the roboRIO reach the physical actuators. Begin with
+the general idea that a hardware ID identifies a control point. Use the 2020
+wiring as the working example without turning the section into a comparison
+between old and current hardware.
 
-- `TimedRobot` and the 20 ms robot loop
-- `robotPeriodic()`
-- `CommandScheduler.run()`
-- Command lifecycle methods
-- Subsystem requirements
-- Default-command scheduling and interruption
+- The driver and operator Xbox controllers connect through USB 0 and USB 1.
+- On this 2020 robot, the motor-controller IDs are roboRIO PWM port numbers.
+  Mention that fact, but emphasize what the IDs do rather than the age of the
+  interface.
+- The roboRIO communicates with CTRE PCM 0 over CAN; the PCM controls the
+  pneumatic valves. The individual solenoids are not CAN devices.
+- PCM solenoid channel pairs 0/1 and 2/3 control the climber.
+- At the end of the presentation, explain that the team's current motor
+  controllers and pneumatics module use CAN rather than PWM. Do not imply that
+  every device on a modern robot uses CAN.
+- Use one closing example to compare a PWM port ID with a CAN device ID. The
+  identifier still selects a control point, and the subsystem still owns the
+  resulting device object.
 
-### Pass 4: Code traces
+### 4. How does the software separate, identify, and talk to each piece?
 
-Trace real actions through the complete system.
+Explain the command-based ownership and runtime path.
 
-- Driver tank drive
-- Slow-drive mode
-- Belt in and belt out
-- Roller operation
-- Climber toggle
-
-Each trace follows this path when applicable:
-
-`Xbox input -> Trigger binding -> CommandScheduler -> command -> subsystem method -> WPILib hardware object -> physical output`
+- `RobotContainer` creates controllers and subsystems, then configures default commands and `Trigger` bindings.
+- Subsystems own the WPILib hardware objects and expose mechanism methods.
+- Commands define robot actions by calling subsystem methods.
+- `Trigger` bindings identify which controller input schedules each command.
+- `CommandScheduler` polls triggers, schedules commands, enforces subsystem requirements, and runs command lifecycle methods.
+- `robotPeriodic()` calls `CommandScheduler.run()` every 20 ms, about 50 times per second.
+- End-to-end traces connect Xbox input to a command, subsystem, WPILib hardware object, and physical output.
 
 ## Content rules
 
 - Focus only on the finished implementation. Do not add the porting or migration process.
 - Use WPILib terminology exactly. Use `subsystem`, `command`, `Trigger`, `requirement`, `default command`, and `CommandScheduler` as WPILib defines them.
-- Keep all four pass labels visible in the slide sequence.
-- A revision may add, remove, or reorder slides inside a pass. It must not remove a pass or convert the deck into a single linear topic sequence without explicit approval.
-- Speaker notes may add detail, but the visible slides must still communicate the progression between passes.
+- Use the durable path `controller input -> command -> subsystem method -> device
+  API -> mechanism`. End primary runtime traces at the device API or mechanism.
+  Keep the PWM-to-CAN comparison out of those traces and place it in the closing
+  hardware example.
+- Describe object creation precisely: `Robot` creates `RobotContainer`;
+  `RobotContainer` creates subsystem objects; subsystem constructors create and
+  own device objects; `RobotContainer` creates command instances, passes the
+  required subsystem references, and configures `Trigger` bindings and default
+  commands.
+- Keep the four questions visible in the slide sequence.
+- Do not replace these questions with separate sections for software structure, runtime behavior, or code traces. Those details belong under question four.
+- Speaker notes may add detail, but the visible slides must still show how each detail answers its section's question.
 
 ## Revision check
 
-Before exporting a new deck, confirm all four statements:
+Before exporting a new deck, confirm all five statements:
 
-1. Pass 1 explains the physical robot and operator controls.
-2. Pass 2 maps the robot to command-based classes.
-3. Pass 3 explains the runtime and scheduler.
-4. Pass 4 traces real actions through the complete implementation.
+1. The opening explains what the robot does.
+2. The next section names and defines the four major subsystems.
+3. The hardware section teaches IDs as control-point identifiers, mentions that
+   this robot's motor IDs are roboRIO PWM ports, and explains the PCM module and
+   channel IDs accurately.
+4. The software section explains ownership, object construction, bindings, scheduling, lifecycle, requirements, and complete control paths.
+5. A closing example shows that a CAN device ID replaces the PWM port ID on
+   modern motor controllers without changing the subsystem and command pattern.

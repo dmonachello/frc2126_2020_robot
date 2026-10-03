@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.BeltInCommand;
@@ -40,7 +39,7 @@ public class RobotContainer {
         rollerSubsystem = new RollerSubsystem();
         this.driveSpeedMode = new DriveSpeedMode();
 
-        CameraServer.startAutomaticCapture(0);
+        // CameraServer.startAutomaticCapture(0);
 
         configureDefaultCommands();
         configureBindings();

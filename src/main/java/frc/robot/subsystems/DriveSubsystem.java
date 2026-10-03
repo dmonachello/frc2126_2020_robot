@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.motorcontrol.DualMotorController;
 
 /**
  * NAME
@@ -22,14 +21,18 @@ public class DriveSubsystem extends SubsystemBase {
      *     DriveSubsystem - creates the drive motors from Constants.
      */
     public DriveSubsystem() {
-        MotorController frontLeftMotor = new Talon(Constants.Hardware.PWM_FRONT_LEFT_DRIVE);
-        MotorController backLeftMotor = new Talon(Constants.Hardware.PWM_BACK_LEFT_DRIVE);
-        MotorController frontRightMotor = new Talon(Constants.Hardware.PWM_FRONT_RIGHT_DRIVE);
-        MotorController backRightMotor = new Talon(Constants.Hardware.PWM_BACK_RIGHT_DRIVE);
+        Talon frontLeftMotor = new Talon(Constants.Hardware.PWM_FRONT_LEFT_DRIVE);
+        Talon backLeftMotor = new Talon(Constants.Hardware.PWM_BACK_LEFT_DRIVE);
+        Talon frontRightMotor = new Talon(Constants.Hardware.PWM_FRONT_RIGHT_DRIVE);
+        Talon backRightMotor = new Talon(Constants.Hardware.PWM_BACK_RIGHT_DRIVE);
 
-        leftDriveMotors = new DualMotorController(frontLeftMotor, backLeftMotor);
-        rightDriveMotors = new DualMotorController(frontRightMotor, backRightMotor);
-        rightDriveMotors.setInverted(true);
+        frontLeftMotor.addFollower(backLeftMotor);
+        frontRightMotor.addFollower(backRightMotor);
+
+        leftDriveMotors = frontLeftMotor;
+        rightDriveMotors = frontRightMotor;
+        leftDriveMotors.setInverted(true);
+        rightDriveMotors.setInverted(false);
     }
 
     /**

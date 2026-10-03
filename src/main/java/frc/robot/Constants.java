@@ -56,9 +56,10 @@ public final class Constants {
     public static final class Tuning {
         public static final double ROLLER_SPEED = 1.0;
         public static final double BELT_SPEED = 1.0;
-        public static final double NORMAL_DRIVE_SCALE = 0.8;
-        public static final double SLOW_DRIVE_SCALE = 0.4;
+        public static final double NORMAL_DRIVE_SCALE = 0.40;
+        public static final double SLOW_DRIVE_SCALE = 0.20;
         public static final double DRIVE_DEADBAND = 0.08;
+        public static final double DRIVE_SLEW_RATE_LIMIT = 0.8;
 
         /** NAME: Tuning - prevents construction of a constants-only group. */
         private Tuning() {

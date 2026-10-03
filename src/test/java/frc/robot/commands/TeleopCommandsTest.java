@@ -20,11 +20,19 @@ public class TeleopCommandsTest {
         DriveSubsystem driveSubsystem = Mockito.mock(DriveSubsystem.class);
         DriveSpeedMode driveSpeedMode = new DriveSpeedMode();
         DriveTeleopCommand command =
-            new DriveTeleopCommand(driveSubsystem, () -> 1.0, () -> -1.0, driveSpeedMode);
+            new DriveTeleopCommand(
+                driveSubsystem,
+                () -> 1.0,
+                () -> -1.0,
+                driveSpeedMode,
+                value -> value,
+                value -> value);
 
         command.execute();
 
-        Mockito.verify(driveSubsystem).drive(0.8, -0.8);
+        Mockito.verify(driveSubsystem).drive(
+            Constants.Tuning.NORMAL_DRIVE_SCALE,
+            -Constants.Tuning.NORMAL_DRIVE_SCALE);
     }
 
     @Test

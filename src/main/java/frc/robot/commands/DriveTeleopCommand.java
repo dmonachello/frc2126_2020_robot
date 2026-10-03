@@ -1,7 +1,9 @@
 package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.DoubleUnaryOperator;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.DriveSpeedMode;
@@ -14,6 +16,8 @@ public class DriveTeleopCommand extends Command {
     private final DoubleSupplier leftDriveSupplier;
     private final DoubleSupplier rightDriveSupplier;
     private final DriveSpeedMode driveSpeedMode;
+    private final DoubleUnaryOperator leftDriveLimiter;
+    private final DoubleUnaryOperator rightDriveLimiter;
 
     /** PARAMETERS: driveSubsystem - drivetrain owner; leftDriveSupplier - left input; rightDriveSupplier - right input; driveSpeedMode - normal or slow scale. */
     public DriveTeleopCommand(
@@ -21,10 +25,28 @@ public class DriveTeleopCommand extends Command {
         DoubleSupplier leftDriveSupplier,
         DoubleSupplier rightDriveSupplier,
         DriveSpeedMode driveSpeedMode) {
+        this(
+            driveSubsystem,
+            leftDriveSupplier,
+            rightDriveSupplier,
+            driveSpeedMode,
+            new SlewRateLimiter(Constants.Tuning.DRIVE_SLEW_RATE_LIMIT)::calculate,
+            new SlewRateLimiter(Constants.Tuning.DRIVE_SLEW_RATE_LIMIT)::calculate);
+    }
+
+    DriveTeleopCommand(
+        DriveSubsystem driveSubsystem,
+        DoubleSupplier leftDriveSupplier,
+        DoubleSupplier rightDriveSupplier,
+        DriveSpeedMode driveSpeedMode,
+        DoubleUnaryOperator leftDriveLimiter,
+        DoubleUnaryOperator rightDriveLimiter) {
         this.driveSubsystem = driveSubsystem;
         this.leftDriveSupplier = leftDriveSupplier;
         this.rightDriveSupplier = rightDriveSupplier;
         this.driveSpeedMode = driveSpeedMode;
+        this.leftDriveLimiter = leftDriveLimiter;
+        this.rightDriveLimiter = rightDriveLimiter;
         addRequirements(driveSubsystem);
     }
 
@@ -32,8 +54,8 @@ public class DriveTeleopCommand extends Command {
     @Override
     public void execute() {
         driveSubsystem.drive(
-            scale(leftDriveSupplier.getAsDouble()),
-            scale(rightDriveSupplier.getAsDouble()));
+            leftDriveLimiter.applyAsDouble(scale(leftDriveSupplier.getAsDouble())),
+            rightDriveLimiter.applyAsDouble(scale(rightDriveSupplier.getAsDouble())));
     }
 
     /** NAME: isFinished - keeps this default command scheduled. RETURNS: always false. */

@@ -158,6 +158,7 @@ bin/
 imgui.ini
 
 # Generated presentation and document review files
+/.codex-build/
 /tmp/
 /output/**/*.inspect.ndjson
 /output/presentations/2020-robot-command-based-migration.pptx

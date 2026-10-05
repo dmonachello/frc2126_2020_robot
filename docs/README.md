@@ -1,6 +1,6 @@
 # Documentation Index
 
-Date: 2026-09-04
+Date: 2026-10-05
 
 This directory holds the migration and teaching notes for converting the 2020 robot project into a 2026 WPILib command-based robot.
 
@@ -9,6 +9,11 @@ This directory holds the migration and teaching notes for converting the 2020 ro
 1. [2026 Migration Spec](./2026-migration-spec.md)
 2. [Blocker Log](./blocker-log.md)
 3. [Presentation Outline](./presentation-outline.md)
+4. [New Programmer Robot Introduction Outline](./new-programmer-robot-introduction-outline-v2.md)
+
+## Presentation Materials
+
+1. [New Programmer Command-Based Onboarding Deck](../output/presentations/2020-robot-command-based-onboarding-v2-final.pptx)
 
 ## Archive References
 

@@ -7,59 +7,54 @@ import frc.robot.Constants;
 
 /**
  * NAME
- *     ClimberSubsystem - owns the two climber pneumatic solenoids.
+ *     ClimberSubsystem - owns the climber's pneumatic control valve.
+ *
+ * DESCRIPTION
+ *     Controls one double-solenoid valve whose two air outputs are split between the left and
+ *     right climber cylinders. Both arms therefore receive the same extend or retract command.
  */
 public class ClimberSubsystem extends SubsystemBase {
-    private final DoubleSolenoid leftClimberSolenoid;
-    private final DoubleSolenoid rightClimberSolenoid;
+    private final DoubleSolenoid climberSolenoid;
 
     /**
      * NAME
-     *     areArmsCommandedExtended - checks whether both climber solenoids are set to extend.
+     *     areArmsCommandedExtended - checks whether the climber valve is set to extend.
      *
      * DESCRIPTION
-     *     Compares each solenoid's current commanded value with its configured outward value.
+     *     Compares the valve's current commanded value with its configured outward value.
      *     This reports the pneumatic command, not the physical position of the climber arms.
      *
      * RETURNS
-     *     true when both solenoids are commanded outward; false otherwise.
+     *     true when the valve is commanded outward; false otherwise.
      */
     public boolean areArmsCommandedExtended() {
-        return leftClimberSolenoid.get() == Constants.Hardware.SOLENOID_LEFT_OUT
-            && rightClimberSolenoid.get() == Constants.Hardware.SOLENOID_RIGHT_OUT;
+        return climberSolenoid.get() == Constants.Hardware.CLIMBER_ARMS_OUT;
     }
 
     /**
      * NAME
-     *     ClimberSubsystem - creates the two climber solenoids.
+     *     ClimberSubsystem - creates the valve that controls both climber arms.
      */
     public ClimberSubsystem() {
-        leftClimberSolenoid = new DoubleSolenoid(
+        climberSolenoid = new DoubleSolenoid(
             Constants.Hardware.PCM,
             PneumaticsModuleType.CTREPCM,
-            Constants.Hardware.SOLENOID_LEFT_FORWARD,
-            Constants.Hardware.SOLENOID_LEFT_REVERSE);
-        rightClimberSolenoid = new DoubleSolenoid(
-            Constants.Hardware.PCM,
-            PneumaticsModuleType.CTREPCM,
-            Constants.Hardware.SOLENOID_RIGHT_FORWARD,
-            Constants.Hardware.SOLENOID_RIGHT_REVERSE);
+            Constants.Hardware.CLIMBER_SOLENOID_FORWARD,
+            Constants.Hardware.CLIMBER_SOLENOID_REVERSE);
     }
 
     /** NAME
      *     extendArms - extends both climber arms.
      */
     public void extendArms() {
-        leftClimberSolenoid.set(Constants.Hardware.SOLENOID_LEFT_OUT);
-        rightClimberSolenoid.set(Constants.Hardware.SOLENOID_RIGHT_OUT);
+        climberSolenoid.set(Constants.Hardware.CLIMBER_ARMS_OUT);
     }
 
     /** NAME
      *     retractArms - retracts both climber arms.
      */
     public void retractArms() {
-        leftClimberSolenoid.set(Constants.Hardware.SOLENOID_LEFT_IN);
-        rightClimberSolenoid.set(Constants.Hardware.SOLENOID_RIGHT_IN);
+        climberSolenoid.set(Constants.Hardware.CLIMBER_ARMS_IN);
     }
 
     /**

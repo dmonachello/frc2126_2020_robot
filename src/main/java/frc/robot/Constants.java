@@ -26,16 +26,11 @@ public final class Constants {
         public static final int PWM_ROLLER = 4;
 
         public static final int PCM = 0;
-        public static final int PDB = 1;
-        public static final int SOLENOID_LEFT_FORWARD = 0;
-        public static final int SOLENOID_LEFT_REVERSE = 1;
-        public static final int SOLENOID_RIGHT_FORWARD = 2;
-        public static final int SOLENOID_RIGHT_REVERSE = 3;
+        public static final int CLIMBER_SOLENOID_FORWARD = 0;
+        public static final int CLIMBER_SOLENOID_REVERSE = 1;
 
-        public static final Value SOLENOID_LEFT_OUT = Value.kForward;
-        public static final Value SOLENOID_LEFT_IN = Value.kReverse;
-        public static final Value SOLENOID_RIGHT_OUT = Value.kForward;
-        public static final Value SOLENOID_RIGHT_IN = Value.kReverse;
+        public static final Value CLIMBER_ARMS_OUT = Value.kForward;
+        public static final Value CLIMBER_ARMS_IN = Value.kReverse;
 
         /** NAME: Hardware - prevents construction of a constants-only group. */
         private Hardware() {

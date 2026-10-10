@@ -1,7 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.BeltInCommand;
 import frc.robot.commands.BeltOutCommand;
 import frc.robot.commands.ToggleClimberArmsCommand;
@@ -21,8 +19,7 @@ import frc.robot.subsystems.RollerSubsystem;
  *     This is the command-based wiring point for the live robot.
  */
 public class RobotContainer {
-    private final CommandXboxController driverController;
-    private final CommandXboxController operatorController;
+    private final RobotControls robotControls;
     private final DriveSubsystem driveSubsystem;
     private final ClimberSubsystem climberSubsystem;
     private final BeltSubsystem beltSubsystem;
@@ -31,8 +28,7 @@ public class RobotContainer {
 
     /** NAME: RobotContainer - creates live controls and robot subsystems. SIDE EFFECTS: starts USB camera capture and installs commands. */
     public RobotContainer() {
-        driverController = new CommandXboxController(Constants.Operator.DRIVER_CONTROLLER);
-        operatorController = new CommandXboxController(Constants.Operator.OPERATOR_CONTROLLER);
+        robotControls = new RobotControls(Constants.Operator.CONTROL_CONFIGURATION);
         driveSubsystem = new DriveSubsystem();
         climberSubsystem = new ClimberSubsystem();
         beltSubsystem = new BeltSubsystem();
@@ -55,25 +51,25 @@ public class RobotContainer {
     /** NAME: configureBindings - maps discrete controller buttons to commands. */
     private void configureBindings() {
         // Every discrete controller action is declared here. The default drive command reads
-        // the driver's two stick axes continuously.
-        // Y toggles the arms once. Releasing the button does not command pneumatic motion.
-        operatorController.y()
+        // the two drive inputs continuously.
+        // The climber action toggles the arms once. Releasing it does not command motion.
+        robotControls.toggleClimber()
             .onTrue(new ToggleClimberArmsCommand(climberSubsystem));
 
         // The belt and roller have independent motors, so each gets a separate subsystem and
         // binding. This allows all mechanism controls to run simultaneously.
-        // whileTrue starts a mechanism command when its button is pressed and cancels it when the
-        // button is released. Each belt or roller command stops its motor from end() afterward.
-        operatorController.a()
+        // whileTrue starts a mechanism command when its control is pressed and cancels it when the
+        // control is released. Each belt or roller command stops its motor from end() afterward.
+        robotControls.beltIn()
             .whileTrue(new BeltInCommand(beltSubsystem));
-        operatorController.b()
+        robotControls.beltOut()
             .whileTrue(new BeltOutCommand(beltSubsystem));
-        // The roller uses the same whileTrue lifecycle: releasing its button cancels
+        // The roller uses the same whileTrue lifecycle: releasing its control cancels
         // RollerCommand, which stops the roller motor from its end() method.
-        operatorController.x()
+        robotControls.runRoller()
             .whileTrue(new RollerCommand(rollerSubsystem));
 
-        driverController.rightBumper()
+        robotControls.slowDrive()
             .whileTrue(new SlowDriveCommand(driveSpeedMode));
     }
 
@@ -83,23 +79,8 @@ public class RobotContainer {
         driveSubsystem.setDefaultCommand(
             new DriveTeleopCommand(
                 driveSubsystem,
-                this::getLeftDriveValue,
-                this::getRightDriveValue,
+                robotControls::getLeftDriveValue,
+                robotControls::getRightDriveValue,
                 driveSpeedMode));
     }
-
-    /** NAME: getLeftDriveValue - reads the oriented left Xbox stick. RETURNS: signed tank-drive input. */
-    private double getLeftDriveValue() {
-        return -MathUtil.applyDeadband(
-            driverController.getLeftY(),
-            Constants.Tuning.DRIVE_DEADBAND);
-    }
-
-    /** NAME: getRightDriveValue - reads the oriented right Xbox stick. RETURNS: signed tank-drive input. */
-    private double getRightDriveValue() {
-        return -MathUtil.applyDeadband(
-            driverController.getRightY(),
-            Constants.Tuning.DRIVE_DEADBAND);
-    }
-
 }

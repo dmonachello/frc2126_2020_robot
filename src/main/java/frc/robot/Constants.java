@@ -39,8 +39,11 @@ public final class Constants {
 
     /** NAME: Operator - controller USB ports. */
     public static final class Operator {
-        public static final int DRIVER_CONTROLLER = 0;
-        public static final int OPERATOR_CONTROLLER = 1;
+        public static final ControlConfiguration CONTROL_CONFIGURATION =
+            ControlConfiguration.XBOX_CONTROLLERS;
+        public static final int USB_0 = 0;
+        public static final int USB_1 = 1;
+        public static final int USB_2 = 2;
 
         /** NAME: Operator - prevents construction of a constants-only group. */
         private Operator() {

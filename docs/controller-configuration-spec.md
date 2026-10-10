@@ -2,7 +2,8 @@
 
 ## Status
 
-This document is a proposal for review. The `XBOX_CTRL_ONLY` Git tag marks the code before these changes.
+The software implementation is complete and awaits physical Logitech controller validation. The
+`XBOX_CTRL_ONLY` Git tag marks the code before these changes.
 
 ## Goal
 
@@ -57,7 +58,8 @@ Driver Station must assign the controllers to these USB positions before the rob
 | Roller | Operator X | Operator joystick button 3 | Operator X |
 | Toggle climber | Operator Y | Operator joystick button 4 | Operator Y |
 
-The joystick button numbers are proposed mappings. Confirm them against the physical Logitech model before implementation is complete.
+The joystick button numbers require confirmation against the physical Logitech model before match
+use.
 
 ## `RobotControls` responsibility
 
